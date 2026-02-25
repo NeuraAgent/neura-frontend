@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit checks for service..."
+
+# Run lint-staged for this service
+npx lint-staged
+
+# Run additional checks
+npm run type-check || {
+    echo "❌ TypeScript check failed"
+    exit 1
+}
+
+echo "✅ Pre-commit checks passed for service"
