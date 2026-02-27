@@ -16,8 +16,7 @@ class CookieService {
       // Clean up test cookie
       document.cookie = 'test=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
       return enabled;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -35,8 +34,7 @@ class CookieService {
         return cookieValue || null;
       }
       return null;
-    } catch (error) {
-      console.error('Error getting cookie:', error);
+    } catch {
       return null;
     }
   }
@@ -50,8 +48,8 @@ class CookieService {
       const expires = new Date();
       expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
       document.cookie = `${name}=${value}; expires=${expires.toUTCString()}; path=/; SameSite=Strict`;
-    } catch (error) {
-      console.error('Error setting cookie:', error);
+    } catch {
+      // Silent fail for cookie operations
     }
   }
 
@@ -61,8 +59,8 @@ class CookieService {
   removeCookie(name: string): void {
     try {
       document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
-    } catch (error) {
-      console.error('Error removing cookie:', error);
+    } catch {
+      // Silent fail for cookie operations
     }
   }
 
@@ -75,13 +73,13 @@ class CookieService {
       cookies.forEach(cookie => {
         const eqPos = cookie.indexOf('=');
         const name =
-          eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+          eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim();
         if (name) {
           this.removeCookie(name);
         }
       });
-    } catch (error) {
-      console.error('Error clearing cookies:', error);
+    } catch {
+      // Silent fail for cookie operations
     }
   }
 
@@ -102,8 +100,8 @@ class CookieService {
         picture: user.picture,
       };
       this.setCookie('user_display', JSON.stringify(displayData));
-    } catch (error) {
-      console.error('Error setting user display data:', error);
+    } catch {
+      // Silent fail for cookie operations
     }
   }
 
@@ -114,8 +112,7 @@ class CookieService {
     try {
       const data = this.getCookie('user_display');
       return data ? JSON.parse(data) : null;
-    } catch (error) {
-      console.error('Error getting user display data:', error);
+    } catch {
       return null;
     }
   }
