@@ -14,14 +14,18 @@ function getFrontendToken(): string {
   const token = import.meta.env.VITE_FRONTEND_JWT_TOKEN;
 
   if (!token) {
-    console.error(
-      '❌ VITE_FRONTEND_JWT_TOKEN not found in environment variables'
-    );
-    console.log('Available env vars:', Object.keys(import.meta.env));
+    if (import.meta.env.NODE_ENV === 'development') {
+      console.error(
+        '❌ VITE_FRONTEND_JWT_TOKEN not found in environment variables'
+      );
+      console.log('Available env vars:', Object.keys(import.meta.env));
+    }
     throw new Error('Frontend JWT token not configured');
   }
 
-  console.log('✅ Frontend token loaded:', token.substring(0, 50) + '...');
+  if (import.meta.env.NODE_ENV === 'development') {
+    console.log('✅ Frontend token loaded:', token.substring(0, 50) + '...');
+  }
   return token;
 }
 
@@ -40,9 +44,13 @@ export function createApiClient(baseURL?: string): AxiosInstance {
       try {
         const frontendToken = getFrontendToken();
         config.headers['x-frontend-token'] = frontendToken;
-        console.log('🔑 Frontend token added to request:', config.url);
+        if (import.meta.env.NODE_ENV === 'development') {
+          console.log('🔑 Frontend token added to request:', config.url);
+        }
       } catch (error) {
-        console.error('❌ Failed to get frontend token:', error);
+        if (import.meta.env.NODE_ENV === 'development') {
+          console.error('❌ Failed to get frontend token:', error);
+        }
       }
 
       // Add user auth token if available
@@ -64,10 +72,14 @@ export function createApiClient(baseURL?: string): AxiosInstance {
     error => {
       if (error.response?.status === 401) {
         // Handle unauthorized - might need to refresh token or redirect to login
-        console.error('Unauthorized request:', error.response?.data);
+        if (import.meta.env.NODE_ENV === 'development') {
+          console.error('Unauthorized request:', error.response?.data);
+        }
       } else if (error.response?.status === 403) {
         // Handle forbidden - frontend doesn't have permission
-        console.error('Forbidden request:', error.response?.data);
+        if (import.meta.env.NODE_ENV === 'development') {
+          console.error('Forbidden request:', error.response?.data);
+        }
       }
       return Promise.reject(error);
     }
