@@ -1,6 +1,7 @@
 import { apiClient } from '@/utils/apiClient';
 
 import { authService } from './authService';
+import toastService from './toastService';
 
 const api = apiClient;
 
@@ -71,7 +72,9 @@ class UserFileService {
       const response = await api.post('/api/files/add', fileInfo);
       return response.data;
     } catch (error: any) {
-      console.error('❌ Error adding file to user profile:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Failed to add file to your profile';
+      toastService.error(errorMessage);
       if (error.response?.data) {
         return error.response.data as ApiResponse<UploadedFile>;
       }
@@ -89,7 +92,9 @@ class UserFileService {
       });
       return response.data;
     } catch (error: any) {
-      console.error('❌ Error removing file from user profile:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Failed to remove file';
+      toastService.error(errorMessage);
       if (error.response?.data) {
         return error.response.data as ApiResponse;
       }
@@ -105,9 +110,9 @@ class UserFileService {
       const response = await api.get('/api/files');
       return response.data;
     } catch (error: any) {
-      console.error('❌ Error fetching user files:', error);
-      console.error('❌ Error response:', error.response?.data);
-      console.error('❌ Error status:', error.response?.status);
+      const errorMessage =
+        error.response?.data?.message || 'Failed to fetch your files';
+      toastService.error(errorMessage);
       if (error.response?.data) {
         return error.response.data as UserFilesResponse;
       }
@@ -123,7 +128,9 @@ class UserFileService {
       const response = await api.get(`/api/files/${fileId}`);
       return response.data;
     } catch (error: any) {
-      console.error('❌ Error fetching file by ID:', error);
+      const errorMessage =
+        error.response?.data?.message || 'Failed to fetch file details';
+      toastService.error(errorMessage);
       if (error.response?.data) {
         return error.response.data as ApiResponse<UploadedFile>;
       }

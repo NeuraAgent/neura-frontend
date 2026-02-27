@@ -9,6 +9,7 @@ import type {
   User,
 } from '@/types';
 import { createApiClient } from '@/utils/apiClient';
+import { handleNetworkError, logError } from '@/utils/errorHandler';
 
 import { cookieService } from './cookieService';
 
@@ -50,16 +51,13 @@ class AuthService {
 
       return data;
     } catch (error: any) {
-      console.error('Login error:', error);
+      logError('Login', error);
 
       if (error.response?.data) {
         return error.response.data as LoginResponse;
       }
 
-      return {
-        success: false,
-        message: 'Network error. Please check your connection and try again.',
-      };
+      return handleNetworkError() as LoginResponse;
     }
   }
 
@@ -71,7 +69,7 @@ class AuthService {
       // Call logout endpoint to invalidate token on server
       await api.post(GATEWAY_API_ENDPOINTS.AUTH_LOGOUT);
     } catch (error) {
-      console.error('Logout error:', error);
+      logError('Logout', error);
     } finally {
       // Clear tokens from localStorage
       localStorage.removeItem(TOKEN_KEY);
@@ -96,16 +94,13 @@ class AuthService {
 
       return response.data;
     } catch (error: any) {
-      console.error('Forgot password error:', error);
+      logError('Forgot Password', error);
 
       if (error.response?.data) {
         return error.response.data as ForgotPasswordResponse;
       }
 
-      return {
-        success: false,
-        message: 'Network error. Please check your connection and try again.',
-      };
+      return handleNetworkError() as ForgotPasswordResponse;
     }
   }
 
@@ -127,16 +122,13 @@ class AuthService {
 
       return response.data;
     } catch (error: any) {
-      console.error('Reset password error:', error);
+      logError('Reset Password', error);
 
       if (error.response?.data) {
         return error.response.data as ForgotPasswordResponse;
       }
 
-      return {
-        success: false,
-        message: 'Network error. Please check your connection and try again.',
-      };
+      return handleNetworkError() as ForgotPasswordResponse;
     }
   }
 
@@ -157,16 +149,13 @@ class AuthService {
 
       return data;
     } catch (error: any) {
-      console.error('Sign up error:', error);
+      logError('Sign Up', error);
 
       if (error.response?.data) {
         return error.response.data as SignUpResponse;
       }
 
-      return {
-        success: false,
-        message: 'Network error. Please check your connection and try again.',
-      };
+      return handleNetworkError() as SignUpResponse;
     }
   }
 
@@ -177,7 +166,7 @@ class AuthService {
     try {
       return cookieService.getUserDisplayData();
     } catch (error) {
-      console.error('Error getting user data:', error);
+      logError('Get Current User', error);
       return null;
     }
   }
@@ -220,7 +209,7 @@ class AuthService {
 
       return false;
     } catch (error) {
-      console.error('Token refresh error:', error);
+      logError('Token Refresh', error);
       return false;
     }
   }
@@ -270,16 +259,13 @@ class AuthService {
         message: data.message,
       };
     } catch (error: any) {
-      console.error('Update language error:', error);
+      logError('Update Language', error);
 
       if (error.response?.data) {
         return error.response.data;
       }
 
-      return {
-        success: false,
-        message: 'Network error. Please check your connection and try again.',
-      };
+      return handleNetworkError();
     }
   }
   /**
@@ -309,16 +295,13 @@ class AuthService {
         message: data.message,
       };
     } catch (error: any) {
-      console.error('Update intro status error:', error);
+      logError('Update Intro Status', error);
 
       if (error.response?.data) {
         return error.response.data;
       }
 
-      return {
-        success: false,
-        message: 'Network error. Please check your connection and try again.',
-      };
+      return handleNetworkError();
     }
   }
 }
