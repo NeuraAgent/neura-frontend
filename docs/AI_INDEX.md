@@ -3,8 +3,10 @@
 When generating code for neura-frontend, ALWAYS read these documents in order:
 
 ## 1. AI_RULES.md
+
 **Purpose**: Coding standards and rules  
-**Read this for**: 
+**Read this for**:
+
 - TypeScript patterns
 - React component patterns
 - Code style rules
@@ -13,6 +15,7 @@ When generating code for neura-frontend, ALWAYS read these documents in order:
 - DO NOT DO list
 
 **Key sections**:
+
 - Global Rules (TypeScript, React, State, API, Styling, Forms, Security)
 - Architecture Rules (Component structure, File organization, Import order)
 - Code Style Rules (Component pattern, Service pattern, Hook pattern)
@@ -20,8 +23,10 @@ When generating code for neura-frontend, ALWAYS read these documents in order:
 - DO NOT DO (Critical mistakes to avoid)
 
 ## 2. ARCHITECTURE.md
+
 **Purpose**: System architecture and structure  
 **Read this for**:
+
 - High-level architecture
 - Directory structure
 - Component hierarchy
@@ -32,6 +37,7 @@ When generating code for neura-frontend, ALWAYS read these documents in order:
 - Performance optimization
 
 **Key sections**:
+
 - Component Hierarchy
 - State Management (AuthContext, LocaleContext, Zustand stores)
 - Data Flow (Authentication, Chat, Document upload)
@@ -39,8 +45,10 @@ When generating code for neura-frontend, ALWAYS read these documents in order:
 - Performance Optimization (Code splitting, Memoization)
 
 ## 3. DOMAIN.md
+
 **Purpose**: Business domain and user workflows  
 **Read this for**:
+
 - Product overview
 - Core concepts (Document KB, Credit system, Subscriptions)
 - User personas (Teacher, Lecturer)
@@ -50,6 +58,7 @@ When generating code for neura-frontend, ALWAYS read these documents in order:
 - UI patterns (Loading, Error, Success states)
 
 **Key sections**:
+
 - Core Concepts (Document Knowledge Base, Document Scope, Credit System)
 - User Personas (Primary: Teacher, Secondary: Lecturer)
 - User Workflows (4 detailed workflows)
@@ -61,6 +70,7 @@ When generating code for neura-frontend, ALWAYS read these documents in order:
 ## Quick Reference
 
 ### When adding a new component:
+
 1. Read AI_RULES.md → Section 3 (Code Style Rules) → Component Pattern
 2. Read ARCHITECTURE.md → Component Hierarchy
 3. Follow TypeScript strict mode
@@ -68,6 +78,7 @@ When generating code for neura-frontend, ALWAYS read these documents in order:
 5. Handle loading and error states
 
 ### When adding a new feature:
+
 1. Read DOMAIN.md → Understand business context
 2. Read ARCHITECTURE.md → Understand data flow
 3. Read AI_RULES.md → Follow coding standards
@@ -75,6 +86,7 @@ When generating code for neura-frontend, ALWAYS read these documents in order:
 5. Then implement UI components
 
 ### When fixing a bug:
+
 1. Read ARCHITECTURE.md → Understand system flow
 2. Read AI_RULES.md → Check for rule violations
 3. Read DOMAIN.md → Understand expected behavior
@@ -82,6 +94,7 @@ When generating code for neura-frontend, ALWAYS read these documents in order:
 5. Add tests to prevent regression
 
 ### When refactoring:
+
 1. Read AI_RULES.md → Ensure compliance
 2. Read ARCHITECTURE.md → Maintain structure
 3. Keep backward compatibility
@@ -109,25 +122,27 @@ neura-frontend/docs/
 When generating code, read in this priority:
 
 **Priority 1 (MUST READ)**:
+
 1. AI_RULES.md - Coding standards
 2. ARCHITECTURE.md - System structure
 3. DOMAIN.md - Business context
 
-**Priority 2 (REFERENCE)**:
-4. TECHNICAL_SPECIFICATION.md - Detailed specs
-5. PRODUCT_DOCUMENT.md - Product requirements
+**Priority 2 (REFERENCE)**: 4. TECHNICAL_SPECIFICATION.md - Detailed specs 5. PRODUCT_DOCUMENT.md - Product requirements
 
 ---
 
 ## Common Scenarios
 
 ### Scenario: Add new page component
+
 **Read**:
+
 1. AI_RULES.md → Component Pattern
 2. ARCHITECTURE.md → Routing, Component Hierarchy
 3. DOMAIN.md → User workflow for that page
 
 **Steps**:
+
 1. Create component in `src/pages/`
 2. Add route in `AppRoutes.tsx`
 3. Add to component hierarchy
@@ -136,12 +151,15 @@ When generating code, read in this priority:
 6. Handle loading/error states
 
 ### Scenario: Add API integration
+
 **Read**:
+
 1. AI_RULES.md → API Calls section
 2. ARCHITECTURE.md → API Integration
 3. DOMAIN.md → Business rules
 
 **Steps**:
+
 1. Create service in `src/services/`
 2. Use apiClient from `@/utils/apiClient`
 3. Handle loading/error states
@@ -149,12 +167,15 @@ When generating code, read in this priority:
 5. Add TypeScript types
 
 ### Scenario: Add state management
+
 **Read**:
+
 1. AI_RULES.md → State Management section
 2. ARCHITECTURE.md → State Management
 3. DOMAIN.md → Data requirements
 
 **Steps**:
+
 1. Decide: Context (global) vs Zustand (complex) vs Local (component)
 2. Create context/store if needed
 3. Follow TypeScript patterns
@@ -162,12 +183,15 @@ When generating code, read in this priority:
 5. Avoid prop drilling
 
 ### Scenario: Add form with validation
+
 **Read**:
+
 1. AI_RULES.md → Forms section
 2. ARCHITECTURE.md → Component Pattern
 3. DOMAIN.md → Business rules for validation
 
 **Steps**:
+
 1. Create Zod schema for validation
 2. Use controlled inputs (useState)
 3. Validate on submit
@@ -193,6 +217,7 @@ When generating code, read in this priority:
 ## Contact
 
 If documentation is unclear or outdated:
+
 1. Check existing code for patterns
 2. Ask for clarification
 3. Update documentation after changes

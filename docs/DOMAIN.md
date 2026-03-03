@@ -16,31 +16,39 @@ This document describes the business domain and user workflows for the neura-fro
 ## Core Concepts
 
 ### 1. Document Knowledge Base
+
 Teachers upload their teaching materials (PDFs, DOCX, TXT) to create a searchable knowledge base. The system:
+
 - Chunks documents into smaller pieces
 - Generates embeddings for semantic search
 - Stores vectors in Qdrant
 - Allows document scope selection for targeted queries
 
 ### 2. Document Scope Selection
+
 Users can select specific documents before asking questions. This allows:
+
 - Targeted search within relevant materials
 - Faster, more accurate answers
 - Better source attribution
 - Efficient credit usage
 
 ### 3. Credit System
+
 Users consume credits for AI operations:
+
 - **Chat**: 1 credit per message
 - **Document Upload**: 10 credits per document
 - **Semantic Search**: 2 credits per query
 - **Document Summary**: 5 credits
 
 Credits are allocated via:
+
 - **Subscription**: Monthly credit allocation
 - **Purchase**: Pay-as-you-go credit purchase
 
 ### 4. Subscription Plans
+
 - **Free**: 100 credits/month, 10 documents, 100MB storage
 - **Basic**: 500 credits/month, 50 documents, 500MB storage
 - **Premium**: 2000 credits/month, 200 documents, 2GB storage
@@ -51,25 +59,30 @@ Credits are allocated via:
 ## User Personas
 
 ### Primary Persona: Teacher (Ms. Nguyen)
+
 **Background**:
+
 - High school math teacher
 - 50+ teaching documents (textbooks, notes, exercises)
 - Prepares lessons daily
 - Limited time for manual searching
 
 **Goals**:
+
 - Quickly find information across multiple documents
 - Prepare lessons efficiently
 - Get teaching suggestions from materials
 - Organize teaching resources
 
 **Pain Points**:
+
 - Manual search is time-consuming
 - Hard to remember which document contains what
 - Difficult to synthesize information across documents
 - Need to prepare lessons quickly
 
 **How NeuraAgent Helps**:
+
 - Upload all teaching materials once
 - Select relevant documents for each topic
 - Ask natural language questions
@@ -77,25 +90,30 @@ Credits are allocated via:
 - Save hours of preparation time
 
 ### Secondary Persona: University Lecturer (Dr. Tran)
+
 **Background**:
+
 - University computer science lecturer
 - 100+ research papers and course materials
 - Teaches multiple courses
 - Needs to stay updated with research
 
 **Goals**:
+
 - Organize research papers
 - Prepare course content
 - Find relevant papers quickly
 - Synthesize research findings
 
 **Pain Points**:
+
 - Too many papers to read manually
 - Hard to find specific information
 - Need to cite sources accurately
 - Time-consuming literature review
 
 **How NeuraAgent Helps**:
+
 - Upload all research papers
 - Search across entire library
 - Get summaries and key findings
@@ -109,6 +127,7 @@ Credits are allocated via:
 ### Workflow 1: New User Onboarding
 
 **Steps**:
+
 1. **Discovery**: User visits landing page
    - Reads about document knowledge base feature
    - Checks pricing and features
@@ -146,6 +165,7 @@ Credits are allocated via:
    - Considers upgrading plan
 
 **UI Components Involved**:
+
 - Landing page (HeroSection, FeaturesSection, PricingSection)
 - SignupForm
 - Email verification page
@@ -159,6 +179,7 @@ Credits are allocated via:
 ### Workflow 2: Daily Lesson Preparation
 
 **Steps**:
+
 1. **Login**: User opens app
    - Auto-login (remembered)
    - Sees dashboard with document library
@@ -193,6 +214,7 @@ Credits are allocated via:
    - Returns tomorrow
 
 **UI Components Involved**:
+
 - Dashboard
 - SourcesManager (document selection)
 - FloatingCreditIndicator
@@ -203,6 +225,7 @@ Credits are allocated via:
 ### Workflow 3: Managing Large Document Library
 
 **Steps**:
+
 1. **Organize Documents**: User has 80+ documents
    - Groups by subject and topic
    - Tags documents for easy finding
@@ -230,6 +253,7 @@ Credits are allocated via:
    - Continues uploading more materials
 
 **UI Components Involved**:
+
 - SourcesManager (with document selection checkboxes)
 - ChatInterface
 - Settings page (subscription management)
@@ -238,6 +262,7 @@ Credits are allocated via:
 ### Workflow 4: Credit Management
 
 **Steps**:
+
 1. **Monitor Usage**: User checks credit balance
    - Sees balance in FloatingCreditIndicator
    - Clicks to see detailed breakdown
@@ -260,6 +285,7 @@ Credits are allocated via:
    - Plans future usage
 
 **UI Components Involved**:
+
 - FloatingCreditIndicator
 - Settings page (Credits tab)
 - CreditBalance component
@@ -270,9 +296,11 @@ Credits are allocated via:
 ## Key Features
 
 ### 1. Landing Page
+
 **Purpose**: Convert visitors to users
 
 **Sections**:
+
 - **Hero**: Clear value proposition + CTA
 - **Features**: 6 key features with icons
 - **How It Works**: 3-step process
@@ -283,6 +311,7 @@ Credits are allocated via:
 - **CTA**: Multiple conversion points
 
 **Components**:
+
 - LandingNav
 - HeroSection
 - FeaturesSection
@@ -295,9 +324,11 @@ Credits are allocated via:
 - Footer
 
 ### 2. Authentication
+
 **Purpose**: Secure access to platform
 
 **Features**:
+
 - Email/password registration
 - Email verification
 - OAuth2 Google login (future)
@@ -306,15 +337,18 @@ Credits are allocated via:
 - Secure logout
 
 **Components**:
+
 - LoginForm
 - SignupForm
 - ForgotPassword
 - OAuthCallback (future)
 
 ### 3. Dashboard (Main Interface)
+
 **Purpose**: Main interaction point with AI
 
 **Features**:
+
 - Real-time chat with streaming responses
 - Document library in sidebar
 - Document scope selection (checkboxes)
@@ -325,6 +359,7 @@ Credits are allocated via:
 - Math equation rendering (KaTeX)
 
 **Components**:
+
 - Dashboard (container)
 - ChatInterface
 - MessageList
@@ -334,9 +369,11 @@ Credits are allocated via:
 - IntroTour
 
 ### 4. Document Management
+
 **Purpose**: Upload and organize teaching materials
 
 **Features**:
+
 - Drag-and-drop upload
 - Supported formats: PDF, DOCX, TXT
 - File size limit: 10MB per document
@@ -346,19 +383,23 @@ Credits are allocated via:
 - Multiple document selection for queries
 
 **Components**:
+
 - FileUploadModal
 - SourcesManager
 
 ### 5. Settings
+
 **Purpose**: Manage account and preferences
 
 **Tabs**:
+
 - **Profile**: Name, email, phone, password
 - **Credits**: Balance, history, purchase
 - **Preferences**: Language, notifications
 - **Subscription**: Current plan, upgrade/downgrade
 
 **Components**:
+
 - Settings (container)
 - ProfileTab
 - CreditsTab
@@ -370,6 +411,7 @@ Credits are allocated via:
 ## Business Rules
 
 ### Document Upload
+
 - Maximum file size: 10MB per document
 - Supported formats: PDF, DOCX, TXT
 - Cost: 10 credits per document
@@ -381,6 +423,7 @@ Credits are allocated via:
   - Enterprise: 10GB (unlimited documents)
 
 ### Credit System
+
 - Credits never expire (purchased credits)
 - Subscription credits reset monthly
 - Unused subscription credits don't roll over
@@ -394,13 +437,16 @@ Credits are allocated via:
   - Document Summary: 5 credits
 
 ### Rate Limiting
+
 Per subscription plan:
+
 - **Free**: 10 req/min, 100 req/hour, 500 req/day
 - **Basic**: 30 req/min, 500 req/hour, 2000 req/day
 - **Premium**: 60 req/min, 1500 req/hour, 10000 req/day
 - **Enterprise**: Unlimited
 
 ### Subscription
+
 - Monthly billing cycle
 - Auto-renewal by default
 - Can cancel anytime (access until end of period)
@@ -413,23 +459,27 @@ Per subscription plan:
 ## User Interface Patterns
 
 ### Loading States
+
 - Show spinner during API calls
 - Show progress bar during file upload
 - Show "AI is thinking..." during chat processing
 - Disable buttons during submission
 
 ### Error States
+
 - Show user-friendly error messages
 - Provide recovery actions (retry, go back)
 - Log errors to console (dev) or error tracking (prod)
 - Never show technical error details to users
 
 ### Success States
+
 - Show success message after actions
 - Auto-dismiss after 3 seconds
 - Provide next action suggestions
 
 ### Empty States
+
 - Show helpful message when no data
 - Provide action to add data
 - Show examples or tutorials
@@ -439,19 +489,23 @@ Per subscription plan:
 ## Internationalization (i18n)
 
 ### Supported Languages
+
 - Vietnamese (default)
 - English
 
 ### Translation Keys
+
 All UI text uses translation keys:
+
 ```typescript
-t('landing.hero.title')
-t('auth.login.button')
-t('dashboard.chat.placeholder')
-t('settings.profile.title')
+t('landing.hero.title');
+t('auth.login.button');
+t('dashboard.chat.placeholder');
+t('settings.profile.title');
 ```
 
 ### Language Switching
+
 - Language switcher in navigation
 - Persists across sessions (localStorage)
 - Applies to all UI elements
@@ -462,18 +516,21 @@ t('settings.profile.title')
 ## Accessibility
 
 ### Keyboard Navigation
+
 - All interactive elements keyboard accessible
 - Tab order follows visual order
 - Escape key closes modals
 - Enter key submits forms
 
 ### Screen Readers
+
 - Semantic HTML elements
 - ARIA labels for icons
 - Alt text for images
 - Descriptive link text
 
 ### Visual
+
 - Sufficient color contrast (WCAG AA)
 - Focus indicators visible
 - Text resizable up to 200%
@@ -484,16 +541,19 @@ t('settings.profile.title')
 ## Performance Targets
 
 ### Loading
+
 - First Contentful Paint: < 1.5s
 - Time to Interactive: < 3s
 - Largest Contentful Paint: < 2.5s
 
 ### Bundle Size
+
 - Total bundle: < 500KB (gzipped)
 - Initial load: < 200KB
 - Code splitting for routes
 
 ### Runtime
+
 - Smooth scrolling (60fps)
 - Instant UI feedback (< 100ms)
 - Streaming response (chunks every 50ms)
@@ -503,18 +563,21 @@ t('settings.profile.title')
 ## Security Considerations
 
 ### Authentication
+
 - JWT tokens with 24h expiration
 - Secure token storage (localStorage)
 - Automatic logout on token expiration
 - HTTPS only in production
 
 ### Data Protection
+
 - No sensitive data in localStorage (except token)
 - Input validation on all forms
 - XSS protection (React built-in)
 - CSRF protection for state-changing operations
 
 ### File Upload
+
 - File type validation (whitelist)
 - File size validation (max 10MB)
 - Virus scanning (backend)
@@ -525,6 +588,7 @@ t('settings.profile.title')
 ## Analytics & Tracking
 
 ### User Events
+
 - Page views
 - Sign up / Login
 - Document upload
@@ -533,12 +597,14 @@ t('settings.profile.title')
 - Subscription upgrade/downgrade
 
 ### Performance Metrics
+
 - Page load times
 - API response times
 - WebSocket connection success rate
 - Error rates
 
 ### Business Metrics
+
 - Daily/Monthly Active Users
 - Conversion rate (visitor → signup)
 - Activation rate (signup → first document)
@@ -579,6 +645,7 @@ A: AI provides answers based on your uploaded documents with source references. 
 ## Future Features
 
 ### Short-term (Q2 2025)
+
 - [ ] Document folders and organization
 - [ ] Document tagging system
 - [ ] Advanced search filters
@@ -587,6 +654,7 @@ A: AI provides answers based on your uploaded documents with source references. 
 - [ ] Dark mode
 
 ### Mid-term (Q3-Q4 2025)
+
 - [ ] Mobile apps (iOS, Android)
 - [ ] Browser extension
 - [ ] Desktop app (Electron)
@@ -595,6 +663,7 @@ A: AI provides answers based on your uploaded documents with source references. 
 - [ ] Custom AI personalities
 
 ### Long-term (2026+)
+
 - [ ] Multi-modal AI (images, audio, video)
 - [ ] Live document editing with AI
 - [ ] Integration with LMS platforms

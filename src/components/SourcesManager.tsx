@@ -360,38 +360,45 @@ const ConfirmDeleteModal: React.FC<{
   onConfirm: () => void;
   onCancel: () => void;
 }> = ({ sourceName, onConfirm, onCancel }) => {
+  const { t } = useLocale();
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-sm">
-        <div className="flex items-center mb-4">
-          <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
-            <Trash2 className="w-5 h-5 text-red-600" />
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-full max-w-md">
+        {/* Header with Icon */}
+        <div className="flex items-start mb-6">
+          <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center mr-4 flex-shrink-0">
+            <Trash2 className="w-6 h-6 text-red-600" />
           </div>
-          <div>
-            <h3 className="text-lg font-medium">Delete Source</h3>
-            <p className="text-sm text-gray-500">
-              This action cannot be undone
-            </p>
+          <div className="flex-1">
+            <h3 className="text-xl font-semibold text-gray-800 mb-1">
+              {t('delete.title')}
+            </h3>
+            <p className="text-sm text-gray-500">{t('delete.cannotUndo')}</p>
           </div>
         </div>
 
-        <p className="text-sm text-gray-700 mb-6">
-          Are you sure you want to delete &quot;<strong>{sourceName}</strong>
-          &quot;? All associated documents will be permanently removed.
+        {/* Content */}
+        <p className="text-sm text-gray-700 mb-8 leading-relaxed">
+          {t('delete.confirmMessage').replace(
+            '{sourceName}',
+            `"${sourceName}"`
+          )}
         </p>
 
+        {/* Actions */}
         <div className="flex justify-end space-x-3">
           <button
             onClick={onCancel}
-            className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
+            className="px-4 py-2.5 text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 font-medium transition-colors"
           >
-            Cancel
+            {t('delete.cancel')}
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700"
+            className="px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 font-medium transition-colors"
           >
-            Delete
+            {t('delete.confirm')}
           </button>
         </div>
       </div>

@@ -41,9 +41,9 @@ interface Message {
 
 const MODEL_OPTIONS = [
   {
-    value: 'gemini-2.5-flash',
-    label: 'Neura 1.0 Flash',
-    icon: '✨',
+    value: 'neura-2.0-flash',
+    label: 'Neura 2.0 Flash',
+    icon: '⚡',
     enabled: true,
   },
 ];

@@ -128,7 +128,8 @@
     "trong",
     "giây",
     "thất",
-    "ngôn"
+    "ngôn",
+    "neura"
   ],
   "flagWords": [],
   "ignorePaths": [
@@ -140,7 +141,8 @@
     "*.log",
     "package-lock.json",
     "yarn.lock",
-    "pnpm-lock.yaml"
+    "pnpm-lock.yaml",
+    "src/contexts/LocaleContext.tsx"
   ],
   "ignoreWords": [],
   "import": [],

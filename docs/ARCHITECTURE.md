@@ -195,6 +195,7 @@ App
 ### 1. React Context (Global State)
 
 **AuthContext** - Authentication state
+
 ```typescript
 interface AuthContextType {
   user: User | null;
@@ -208,6 +209,7 @@ interface AuthContextType {
 ```
 
 **LocaleContext** - Internationalization
+
 ```typescript
 interface LocaleContextType {
   locale: 'vi' | 'en';
@@ -219,6 +221,7 @@ interface LocaleContextType {
 ### 2. Zustand Stores (Client State)
 
 **userStore** - User data and file management
+
 ```typescript
 interface UserStore {
   user: User | null;
@@ -230,6 +233,7 @@ interface UserStore {
 ```
 
 **introTourStore** - Onboarding tour state
+
 ```typescript
 interface IntroTourStore {
   isOpen: boolean;
@@ -245,6 +249,7 @@ interface IntroTourStore {
 ### 3. Local State (Component State)
 
 Use `useState` for component-specific state:
+
 - Form inputs
 - UI toggles (modals, dropdowns)
 - Loading states
@@ -255,6 +260,7 @@ Use `useState` for component-specific state:
 ## Data Flow
 
 ### Authentication Flow
+
 ```
 1. User submits login form
    ↓
@@ -272,6 +278,7 @@ Use `useState` for component-specific state:
 ```
 
 ### Chat Flow
+
 ```
 1. User types message in MessageInput
    ↓
@@ -295,6 +302,7 @@ Use `useState` for component-specific state:
 ```
 
 ### Document Upload Flow
+
 ```
 1. User selects file in FileUploadModal
    ↓
@@ -320,30 +328,33 @@ Use `useState` for component-specific state:
 ## Routing
 
 ### Public Routes
+
 - `/` - Landing page
 - `/login` - Login page
 - `/signup` - Signup page
 - `/forgot-password` - Password reset
 
 ### Protected Routes (require authentication)
+
 - `/dashboard` - Main chat interface
 - `/settings` - User settings
 - `/profile` - User profile
 
 ### Route Protection
+
 ```typescript
 // AppRoutes.tsx
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useAuth();
-  
+
   if (isLoading) {
     return <LoadingSpinner />;
   }
-  
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-  
+
   return <>{children}</>;
 };
 ```
@@ -353,6 +364,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 ## API Integration
 
 ### HTTP Client (Axios)
+
 ```typescript
 // utils/apiClient.ts
 import axios from 'axios';
@@ -363,7 +375,7 @@ export const apiClient = axios.create({
 });
 
 // Request interceptor (add auth token)
-apiClient.interceptors.request.use((config) => {
+apiClient.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -373,8 +385,8 @@ apiClient.interceptors.request.use((config) => {
 
 // Response interceptor (handle errors)
 apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
+  response => response,
+  error => {
     if (error.response?.status === 401) {
       // Token expired, logout
       localStorage.removeItem('token');
@@ -386,36 +398,37 @@ apiClient.interceptors.response.use(
 ```
 
 ### WebSocket Client (Socket.IO)
+
 ```typescript
 // services/socketService.ts
 import { io, Socket } from 'socket.io-client';
 
 class SocketService {
   private socket: Socket | null = null;
-  
+
   connect(token: string) {
     this.socket = io(import.meta.env.VITE_WEBSOCKET_URL, {
       auth: { token },
       transports: ['websocket'],
     });
-    
+
     this.socket.on('connect', () => {
       console.log('WebSocket connected');
     });
-    
+
     this.socket.on('disconnect', () => {
       console.log('WebSocket disconnected');
     });
   }
-  
+
   emit(event: string, data: any) {
     this.socket?.emit(event, data);
   }
-  
+
   on(event: string, callback: (data: any) => void) {
     this.socket?.on(event, callback);
   }
-  
+
   disconnect() {
     this.socket?.disconnect();
   }
@@ -429,6 +442,7 @@ export const socketService = new SocketService();
 ## Performance Optimization
 
 ### Code Splitting
+
 ```typescript
 // App.tsx
 import { lazy, Suspense } from 'react';
@@ -443,6 +457,7 @@ const Settings = lazy(() => import('@/pages/Settings'));
 ```
 
 ### Memoization
+
 ```typescript
 // Expensive computation
 const sortedMessages = useMemo(() => {
@@ -459,6 +474,7 @@ const MemoizedComponent = React.memo(Component);
 ```
 
 ### Image Optimization
+
 - Use WebP format
 - Lazy load images
 - Use responsive images with srcset
@@ -469,18 +485,21 @@ const MemoizedComponent = React.memo(Component);
 ## Security
 
 ### Authentication
+
 - JWT tokens stored in localStorage
 - Tokens included in Authorization header
 - Automatic logout on token expiration
 - Secure token refresh mechanism
 
 ### Input Validation
+
 - Client-side validation with Zod
 - Sanitize user input before rendering
 - Validate file uploads (type, size)
 - Never trust client-side validation alone
 
 ### XSS Protection
+
 - React's built-in XSS protection
 - Never use dangerouslySetInnerHTML
 - Sanitize markdown content
@@ -491,6 +510,7 @@ const MemoizedComponent = React.memo(Component);
 ## Error Handling
 
 ### Error Boundary
+
 ```typescript
 // components/error/ErrorBoundary.tsx
 class ErrorBoundary extends React.Component {
@@ -498,7 +518,7 @@ class ErrorBoundary extends React.Component {
     console.error('Error caught:', error, errorInfo);
     // Log to error tracking service
   }
-  
+
   render() {
     if (this.state.hasError) {
       return <ErrorPage />;
@@ -509,6 +529,7 @@ class ErrorBoundary extends React.Component {
 ```
 
 ### API Error Handling
+
 ```typescript
 try {
   const response = await authService.login(email, password);
@@ -528,18 +549,21 @@ try {
 ## Build & Deployment
 
 ### Development
+
 ```bash
 npm run dev
 # Runs on http://localhost:3000
 ```
 
 ### Production Build
+
 ```bash
 npm run build
 # Output: dist/
 ```
 
 ### Docker Deployment
+
 ```dockerfile
 # Multi-stage build
 FROM node:18-alpine AS builder
@@ -592,11 +616,13 @@ VITE_ENABLE_INTRO_TOUR=true
 ## Integration Points
 
 ### Backend Services
+
 - **API Gateway** (http://localhost:9999) - All REST API calls
 - **AI Core** (ws://localhost:8000) - WebSocket for chat streaming
 - **Auth Server** (OAuth2) - Social login (future)
 
 ### External Services
+
 - **Google Fonts** - Typography
 - **CDN** - Static assets (production)
 

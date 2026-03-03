@@ -1,15 +1,8 @@
-import {
-  X,
-  Upload,
-  FileText,
-  File,
-  AlertCircle,
-  CheckCircle,
-  Loader,
-} from 'lucide-react';
+import { X, Upload, AlertCircle, CheckCircle, Loader } from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
 
 import { chunkService } from '@/services/chunkService';
+import ocrService from '@/services/ocrService';
 import {
   s3StorageService,
   UploadProgress,
@@ -21,6 +14,7 @@ import {
   formatFileToMarkdown,
   isFileTypeSupported,
 } from '@/utils/fileFormatUtils';
+import { convertPDFToImages } from '@/utils/pdfToImage';
 
 interface FileUploadModalProps {
   isOpen: boolean;
@@ -84,6 +78,8 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
       return true;
     });
 
+    if (validFiles.length === 0) return;
+
     const filesWithProgress: FileWithProgress[] = validFiles.map(file => ({
       file,
       progress: {
@@ -95,6 +91,11 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
 
     setSelectedFiles(filesWithProgress);
     setUploadResults([]);
+
+    // Auto-start upload
+    setTimeout(() => {
+      startUpload(filesWithProgress);
+    }, 100);
   };
 
   const handleDragOver = (event: React.DragEvent) => {
@@ -117,6 +118,8 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
       return true;
     });
 
+    if (validFiles.length === 0) return;
+
     const filesWithProgress: FileWithProgress[] = validFiles.map(file => ({
       file,
       progress: {
@@ -128,100 +131,292 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
 
     setSelectedFiles(filesWithProgress);
     setUploadResults([]);
+
+    // Auto-start upload
+    setTimeout(() => {
+      startUpload(filesWithProgress);
+    }, 100);
   };
 
-  const removeFile = (index: number) => {
-    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const handleUpload = async () => {
-    if (selectedFiles.length === 0) return;
+  const startUpload = async (filesToUpload: FileWithProgress[]) => {
+    if (filesToUpload.length === 0) return;
 
     setIsUploading(true);
     setUploadResults([]);
 
     try {
-      // Upload files to S3
-      const results = await s3StorageService.uploadMultipleFiles(
-        selectedFiles.map(f => f.file),
-        (fileName, progress) => {
-          setSelectedFiles(prev =>
-            prev.map(f => (f.file.name === fileName ? { ...f, progress } : f))
-          );
-        }
-      );
+      const results: FileUploadResult[] = [];
 
-      setUploadResults(results);
+      // Process each file
+      for (const fileWithProgress of filesToUpload) {
+        const file = fileWithProgress.file;
+        const isPdf = file.name.toLowerCase().endsWith('.pdf');
 
-      // Process successful uploads and store to vector database
-      const successfulUploads = results.filter(r => r.success);
-
-      for (const result of successfulUploads) {
         try {
-          // Read and format file content for embedding
-          const file = selectedFiles.find(
-            f => f.file.name === result.fileName
-          )?.file;
-          if (!file) continue;
+          let fileContent: string;
+          let fileId: string;
 
-          const fileContent = await formatFileToMarkdown(file);
-          const fileId =
-            result.s3Key.split('/').pop()?.split('_sha')[1]?.split('sha')[0] ||
-            result.s3Key;
+          if (isPdf) {
+            // PDF: Use OCR API
+            setSelectedFiles(prev =>
+              prev.map(f =>
+                f.file.name === file.name
+                  ? {
+                      ...f,
+                      progress: {
+                        ...f.progress,
+                        progress: 10,
+                        status: 'uploading' as const,
+                      },
+                    }
+                  : f
+              )
+            );
 
-          // Chunk file content and store to vector database
+            // Convert PDF to images
+            const pdfImages = await convertPDFToImages(
+              file,
+              150,
+              (current, total) => {
+                const progress = 10 + Math.floor((current / total) * 30);
+                setSelectedFiles(prev =>
+                  prev.map(f =>
+                    f.file.name === file.name
+                      ? {
+                          ...f,
+                          progress: {
+                            ...f.progress,
+                            progress,
+                            status: 'uploading' as const,
+                          },
+                        }
+                      : f
+                  )
+                );
+              }
+            );
+
+            // Extract text using OCR
+            setSelectedFiles(prev =>
+              prev.map(f =>
+                f.file.name === file.name
+                  ? {
+                      ...f,
+                      progress: {
+                        ...f.progress,
+                        progress: 40,
+                        status: 'uploading' as const,
+                      },
+                    }
+                  : f
+              )
+            );
+
+            const ocrResult = await ocrService.extractTextFromPDF(
+              pdfImages.map(img => ({
+                page_number: img.pageNumber,
+                image_base64: img.imageBase64,
+              }))
+            );
+
+            if (!ocrResult.success) {
+              results.push({
+                success: false,
+                fileName: file.name,
+                s3FileName: '',
+                s3Key: '',
+                s3Url: '',
+                error: ocrResult.error || 'OCR extraction failed',
+              });
+              continue;
+            }
+
+            fileContent = ocrResult.full_text;
+          } else {
+            // Non-PDF: Use legacy formatFileToMarkdown
+            setSelectedFiles(prev =>
+              prev.map(f =>
+                f.file.name === file.name
+                  ? {
+                      ...f,
+                      progress: {
+                        ...f.progress,
+                        progress: 20,
+                        status: 'uploading' as const,
+                      },
+                    }
+                  : f
+              )
+            );
+
+            fileContent = await formatFileToMarkdown(file);
+          }
+
+          // Upload file to S3
+          const uploadProgress = isPdf ? 60 : 40;
+          setSelectedFiles(prev =>
+            prev.map(f =>
+              f.file.name === file.name
+                ? {
+                    ...f,
+                    progress: {
+                      ...f.progress,
+                      progress: uploadProgress,
+                      status: 'uploading' as const,
+                    },
+                  }
+                : f
+            )
+          );
+
+          const uploadResult = await s3StorageService.uploadFile(
+            file,
+            progress => {
+              const currentProgress =
+                uploadProgress + Math.floor((progress.progress / 100) * 20);
+              setSelectedFiles(prev =>
+                prev.map(f =>
+                  f.file.name === file.name
+                    ? {
+                        ...f,
+                        progress: {
+                          ...f.progress,
+                          progress: currentProgress,
+                          status: 'uploading' as const,
+                        },
+                      }
+                    : f
+                )
+              );
+            }
+          );
+
+          if (!uploadResult.success) {
+            results.push(uploadResult);
+            continue;
+          }
+
+          // eslint-disable-next-line prefer-const
+          fileId =
+            uploadResult.s3Key
+              .split('/')
+              .pop()
+              ?.split('_sha')[1]
+              ?.split('sha')[0] || uploadResult.s3Key;
+
+          // Chunk and store to VectorDB
+          const chunkProgress = isPdf ? 80 : 70;
+          setSelectedFiles(prev =>
+            prev.map(f =>
+              f.file.name === file.name
+                ? {
+                    ...f,
+                    progress: {
+                      ...f.progress,
+                      progress: chunkProgress,
+                      status: 'uploading' as const,
+                    },
+                  }
+                : f
+            )
+          );
+
           const chunkResult = await chunkService.chunkAndStoreFile(
             fileContent,
             {
-              fileName: result.s3FileName,
+              fileName: uploadResult.s3FileName,
               fileId: fileId,
               userId: user?.id || 'anonymous',
-              subject: 'Uploaded File', // Default subject, could be made configurable
-              week: 'week01', // Default week, could be made configurable
-              title: result.fileName,
+              subject: 'Uploaded File',
+              week: 'week01',
+              title: file.name,
             }
           );
 
           if (!chunkResult?.success) {
             console.error(
-              `❌ Failed to chunk file ${result.fileName}:`,
+              `❌ Failed to chunk file ${file.name}:`,
               chunkResult.error
             );
           }
 
-          // Add file to user's profile in auth-service
+          // Add file to user profile
+          setSelectedFiles(prev =>
+            prev.map(f =>
+              f.file.name === file.name
+                ? {
+                    ...f,
+                    progress: {
+                      ...f.progress,
+                      progress: 90,
+                      status: 'uploading' as const,
+                    },
+                  }
+                : f
+            )
+          );
+
           if (isAuthenticated && user) {
             try {
+              const getFileType = (file: File): string => {
+                const extension = file.name.split('.').pop()?.toLowerCase();
+                return extension || 'unknown';
+              };
+
               await userFileService.addFile({
                 fileId,
-                fileName: result.s3FileName,
-                originalName: result.fileName,
+                fileName: uploadResult.s3FileName,
+                originalName: file.name,
                 fileType: getFileType(file),
                 fileSize: file.size,
-                s3Key: result.s3Key,
-                s3Url: result.s3Url,
+                s3Key: uploadResult.s3Key,
+                s3Url: uploadResult.s3Url,
                 metadata: {
-                  subject: 'Uploaded File', // Default subject, could be made configurable
-                  title: result.fileName,
-                  tags: `uploaded,${getFileType(file)}`,
+                  subject: 'Uploaded File',
+                  title: file.name,
+                  tags: 'uploaded',
                 },
               });
               setFileIds([...getFileIds(), fileId]);
             } catch (userFileError) {
               console.error(
-                `⚠️ Failed to add file ${result.fileName} to user profile:`,
+                `⚠️ Failed to add file ${file.name} to user profile:`,
                 userFileError
               );
             }
-          } else {
-            console.warn(
-              `⚠️ User not authenticated, skipping user profile update for ${result.fileName}`
-            );
           }
+
+          // Complete
+          setSelectedFiles(prev =>
+            prev.map(f =>
+              f.file.name === file.name
+                ? {
+                    ...f,
+                    progress: {
+                      ...f.progress,
+                      progress: 100,
+                      status: 'completed' as const,
+                    },
+                  }
+                : f
+            )
+          );
+
+          results.push(uploadResult);
         } catch (error) {
-          console.error(`Failed to process file ${result.fileName}:`, error);
+          console.error(`Failed to process file ${file.name}:`, error);
+          results.push({
+            success: false,
+            fileName: file.name,
+            s3FileName: '',
+            s3Key: '',
+            s3Url: '',
+            error: error instanceof Error ? error.message : 'Processing failed',
+          });
         }
       }
+
+      setUploadResults(results);
 
       // Show success message and close modal after a delay
       setTimeout(() => {
@@ -236,33 +431,12 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
     }
   };
 
-  const getFileType = (file: File): string => {
-    if (file.name.toLowerCase().endsWith('.txt')) return 'txt';
-    if (file.name.toLowerCase().endsWith('.pdf')) return 'pdf';
-    if (file.name.toLowerCase().endsWith('.docx')) return 'docx';
-    if (file.name.toLowerCase().endsWith('.md')) return 'md';
-    return 'unknown';
-  };
-
   const handleClose = () => {
     if (!isUploading) {
       setSelectedFiles([]);
       setUploadResults([]);
       onClose();
     }
-  };
-
-  const getFileIcon = (fileName: string) => {
-    if (fileName.toLowerCase().endsWith('.pdf')) {
-      return <File className="w-5 h-5 text-red-500" />;
-    }
-    if (fileName.toLowerCase().endsWith('.docx')) {
-      return <File className="w-5 h-5 text-blue-500" />;
-    }
-    if (fileName.toLowerCase().endsWith('.md')) {
-      return <FileText className="w-5 h-5 text-green-500" />;
-    }
-    return <FileText className="w-5 h-5 text-gray-500" />;
   };
 
   return (
@@ -308,7 +482,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
             </p>
             <p className="text-sm text-gray-500 mb-3">or click to browse</p>
             <p className="text-xs text-gray-400">
-              Supported: DOCX, PDF, TXT, MD
+              Supported: PDF, DOCX, TXT, MD
             </p>
           </div>
           <input
@@ -316,51 +490,12 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
             ref={fileInputRef}
             type="file"
             multiple
-            accept=".docx,.pdf,.txt,.md"
+            accept=".pdf,.docx,.txt,.md"
             onChange={handleFileSelect}
             disabled={isUploading}
             className="hidden"
           />
         </div>
-
-        {/* Selected Files List */}
-        {selectedFiles.length > 0 && !isUploading && (
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-medium text-gray-700">
-                {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''}{' '}
-                selected
-              </h3>
-            </div>
-            <div className="space-y-2">
-              {selectedFiles.map((fileWithProgress, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
-                >
-                  <div className="flex items-center space-x-3 flex-1 min-w-0">
-                    {getFileIcon(fileWithProgress.file.name)}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-800 truncate">
-                        {fileWithProgress.file.name}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {(fileWithProgress.file.size / 1024).toFixed(1)} KB
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => removeFile(index)}
-                    className="p-1.5 hover:bg-red-50 rounded-full transition-colors ml-2"
-                    title="Remove file"
-                  >
-                    <X className="w-4 h-4 text-gray-400 hover:text-red-600" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Progress Bars */}
         {isUploading && (
@@ -448,24 +583,13 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
               Done
             </button>
           ) : (
-            <>
-              <button
-                onClick={handleClose}
-                disabled={isUploading}
-                className="px-4 py-2 text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-50 transition-colors"
-              >
-                Cancel
-              </button>
-              {selectedFiles.length > 0 && !isUploading && (
-                <button
-                  onClick={handleUpload}
-                  className="px-6 py-2.5 bg-gray-800 text-white rounded-xl hover:bg-gray-900 font-medium transition-colors"
-                >
-                  Upload {selectedFiles.length} file
-                  {selectedFiles.length > 1 ? 's' : ''}
-                </button>
-              )}
-            </>
+            <button
+              onClick={handleClose}
+              disabled={isUploading}
+              className="px-4 py-2 text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            >
+              {isUploading ? 'Uploading...' : 'Cancel'}
+            </button>
           )}
         </div>
       </div>

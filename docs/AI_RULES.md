@@ -7,6 +7,7 @@ AI agents MUST follow these rules when working with neura-frontend codebase.
 ## 1. Global Rules (MUST FOLLOW)
 
 ### TypeScript
+
 - ALWAYS use TypeScript strict mode
 - ALWAYS define types for props, state, and function parameters
 - NEVER use `any` type (use `unknown` if type is truly unknown)
@@ -15,6 +16,7 @@ AI agents MUST follow these rules when working with neura-frontend codebase.
 - ALWAYS export types from `@/types/index.ts`
 
 ### React Components
+
 - ALWAYS use functional components with hooks
 - NEVER use class components
 - ALWAYS use TypeScript for component props
@@ -25,6 +27,7 @@ AI agents MUST follow these rules when working with neura-frontend codebase.
 - ALWAYS use `React.memo` for pure components
 
 ### State Management
+
 - USE React Context for global state (auth, locale)
 - USE Zustand for complex client state (user store, tour store)
 - USE useState for local component state
@@ -33,6 +36,7 @@ AI agents MUST follow these rules when working with neura-frontend codebase.
 - NEVER mutate state directly (use immutable updates)
 
 ### API Calls
+
 - ALWAYS use service layer (`@/services/*`)
 - NEVER make API calls directly in components
 - ALWAYS handle loading states
@@ -42,6 +46,7 @@ AI agents MUST follow these rules when working with neura-frontend codebase.
 - ALWAYS cancel requests on component unmount
 
 ### Styling
+
 - ALWAYS use Tailwind CSS utility classes
 - NEVER write custom CSS unless absolutely necessary
 - ALWAYS use responsive design (mobile-first)
@@ -50,6 +55,7 @@ AI agents MUST follow these rules when working with neura-frontend codebase.
 - ALWAYS use consistent spacing (4, 8, 16, 24, 32, 48, 64)
 
 ### Forms
+
 - ALWAYS validate input on client side
 - ALWAYS use Zod for validation schemas
 - ALWAYS show validation errors inline
@@ -59,6 +65,7 @@ AI agents MUST follow these rules when working with neura-frontend codebase.
 - NEVER trust client-side validation alone
 
 ### Security
+
 - NEVER store sensitive data in localStorage (except JWT token)
 - ALWAYS sanitize user input before rendering
 - NEVER use dangerouslySetInnerHTML
@@ -72,6 +79,7 @@ AI agents MUST follow these rules when working with neura-frontend codebase.
 ## 2. Architecture Rules
 
 ### Component Structure
+
 ```
 Component/
 ├── Component.tsx           # Main component
@@ -80,6 +88,7 @@ Component/
 ```
 
 ### File Organization
+
 ```
 src/
 ├── components/             # Reusable UI components
@@ -98,6 +107,7 @@ src/
 ```
 
 ### Import Order
+
 ```typescript
 // 1. React and external libraries
 import React, { useState, useEffect } from 'react';
@@ -123,7 +133,9 @@ import './Component.css';
 ```
 
 ### Path Aliases
+
 ALWAYS use path aliases (configured in vite.config.ts):
+
 ```typescript
 // ✅ GOOD
 import { Button } from '@/components/Button';
@@ -140,6 +152,7 @@ import { useAuth } from '../../contexts/AuthContext';
 ## 3. Code Style Rules
 
 ### Component Pattern
+
 ```typescript
 import React from 'react';
 import type { FC } from 'react';
@@ -150,24 +163,24 @@ interface ComponentProps {
   isLoading?: boolean;
 }
 
-export const Component: FC<ComponentProps> = ({ 
-  title, 
-  onSubmit, 
-  isLoading = false 
+export const Component: FC<ComponentProps> = ({
+  title,
+  onSubmit,
+  isLoading = false
 }) => {
   // 1. Hooks (useState, useEffect, useContext, custom hooks)
   const [value, setValue] = useState('');
   const { user } = useAuth();
-  
+
   // 2. Derived state and memoized values
   const isValid = useMemo(() => value.length > 0, [value]);
-  
+
   // 3. Event handlers
   const handleSubmit = useCallback(() => {
     if (!isValid) return;
     onSubmit({ value });
   }, [value, isValid, onSubmit]);
-  
+
   // 4. Effects
   useEffect(() => {
     // Side effects
@@ -175,12 +188,12 @@ export const Component: FC<ComponentProps> = ({
       // Cleanup
     };
   }, []);
-  
+
   // 5. Early returns
   if (!user) {
     return <div>Please login</div>;
   }
-  
+
   // 6. Render
   return (
     <div className="container mx-auto p-4">
@@ -204,6 +217,7 @@ export const Component: FC<ComponentProps> = ({
 ```
 
 ### Service Pattern
+
 ```typescript
 // services/exampleService.ts
 import axios from 'axios';
@@ -220,7 +234,7 @@ class ExampleService {
       throw error;
     }
   }
-  
+
   async createData(data: ExampleData): Promise<ApiResponse<ExampleData>> {
     try {
       const response = await apiClient.post('/api/example', data);
@@ -236,6 +250,7 @@ export const exampleService = new ExampleService();
 ```
 
 ### Custom Hook Pattern
+
 ```typescript
 // hooks/useExample.ts
 import { useState, useEffect } from 'react';
@@ -246,12 +261,12 @@ export const useExample = (id: string) => {
   const [data, setData] = useState<ExampleData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
-      
+
       try {
         const response = await exampleService.getData(id);
         if (response.success) {
@@ -265,10 +280,10 @@ export const useExample = (id: string) => {
         setIsLoading(false);
       }
     };
-    
+
     fetchData();
   }, [id]);
-  
+
   return { data, isLoading, error };
 };
 ```
@@ -278,6 +293,7 @@ export const useExample = (id: string) => {
 ## 4. Specific Rules
 
 ### Authentication
+
 - ALWAYS check authentication before rendering protected routes
 - ALWAYS redirect to login if not authenticated
 - ALWAYS store JWT token in localStorage
@@ -286,6 +302,7 @@ export const useExample = (id: string) => {
 - ALWAYS clear token on logout
 
 ### WebSocket
+
 - ALWAYS use socketService for WebSocket connections
 - ALWAYS handle connection/disconnection events
 - ALWAYS clean up listeners on component unmount
@@ -294,6 +311,7 @@ export const useExample = (id: string) => {
 - NEVER create multiple socket connections
 
 ### File Upload
+
 - ALWAYS validate file type before upload
 - ALWAYS validate file size (max 10MB)
 - ALWAYS show upload progress
@@ -302,6 +320,7 @@ export const useExample = (id: string) => {
 - NEVER upload files without user confirmation
 
 ### Error Handling
+
 - ALWAYS show user-friendly error messages
 - ALWAYS log errors to console (dev) or error tracking (prod)
 - ALWAYS provide recovery actions (retry, go back)
@@ -310,6 +329,7 @@ export const useExample = (id: string) => {
 - ALWAYS handle async errors with try-catch
 
 ### Performance
+
 - ALWAYS lazy load routes with React.lazy
 - ALWAYS use React.memo for expensive components
 - ALWAYS debounce search inputs
@@ -322,6 +342,7 @@ export const useExample = (id: string) => {
 ## 5. Testing Rules (Future)
 
 ### Unit Tests
+
 - ALWAYS test component rendering
 - ALWAYS test user interactions
 - ALWAYS test error states
@@ -330,6 +351,7 @@ export const useExample = (id: string) => {
 - ALWAYS use React Testing Library
 
 ### Integration Tests
+
 - ALWAYS test complete user flows
 - ALWAYS test API integration
 - ALWAYS test authentication flow
@@ -340,6 +362,7 @@ export const useExample = (id: string) => {
 ## 6. DO NOT DO (Critical)
 
 ### Code
+
 - ❌ DO NOT use `any` type
 - ❌ DO NOT use class components
 - ❌ DO NOT use inline styles (except dynamic values)
@@ -350,6 +373,7 @@ export const useExample = (id: string) => {
 - ❌ DO NOT use `console.log` in production
 
 ### React
+
 - ❌ DO NOT use index as key in lists
 - ❌ DO NOT call hooks conditionally
 - ❌ DO NOT call hooks in loops
@@ -358,6 +382,7 @@ export const useExample = (id: string) => {
 - ❌ DO NOT prop drill more than 2 levels
 
 ### Security
+
 - ❌ DO NOT store passwords in state
 - ❌ DO NOT trust user input
 - ❌ DO NOT skip input validation
@@ -366,6 +391,7 @@ export const useExample = (id: string) => {
 - ❌ DO NOT use eval() or Function()
 
 ### Performance
+
 - ❌ DO NOT render large lists without pagination
 - ❌ DO NOT create functions in render
 - ❌ DO NOT use inline object/array literals in props
@@ -404,6 +430,7 @@ When user asks to add/modify frontend code, ALWAYS respond in this order:
 ## 8. Common Patterns
 
 ### Loading State
+
 ```typescript
 const [isLoading, setIsLoading] = useState(false);
 
@@ -418,6 +445,7 @@ const [isLoading, setIsLoading] = useState(false);
 ```
 
 ### Error State
+
 ```typescript
 const [error, setError] = useState<string | null>(null);
 
@@ -430,6 +458,7 @@ const [error, setError] = useState<string | null>(null);
 ```
 
 ### Form Validation
+
 ```typescript
 import { z } from 'zod';
 
@@ -451,6 +480,7 @@ const handleSubmit = (data: FormData) => {
 ```
 
 ### API Call with Loading/Error
+
 ```typescript
 const [data, setData] = useState<Data | null>(null);
 const [isLoading, setIsLoading] = useState(false);
@@ -460,7 +490,7 @@ useEffect(() => {
   const fetchData = async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await service.getData();
       if (response.success) {
@@ -474,7 +504,7 @@ useEffect(() => {
       setIsLoading(false);
     }
   };
-  
+
   fetchData();
 }, []);
 ```
@@ -484,6 +514,7 @@ useEffect(() => {
 ## Summary
 
 These rules ensure:
+
 - ✅ Type safety with TypeScript
 - ✅ Consistent code style
 - ✅ Proper error handling
@@ -492,6 +523,7 @@ These rules ensure:
 - ✅ Maintainable code structure
 
 **When in doubt**:
+
 1. Check existing components for patterns
 2. Follow TypeScript strict mode
 3. Use Tailwind for styling

@@ -164,6 +164,14 @@ const en = {
   'files.selectAll': 'Select all',
   'files.source': 'Source',
 
+  // Delete Modal
+  'delete.title': 'Delete Source',
+  'delete.cannotUndo': 'This action cannot be undone',
+  'delete.confirmMessage':
+    'Are you sure you want to delete {sourceName}? All associated documents will be permanently removed from your knowledge base.',
+  'delete.cancel': 'Cancel',
+  'delete.confirm': 'Delete Source',
+
   // Chat
   'chat.title': 'Chat Interface',
   'chat.copy': 'Copy',
@@ -643,6 +651,14 @@ const vi = {
   'files.addButton': 'Thêm',
   'files.selectAll': 'Chọn tất cả',
   'files.source': 'Nguồn',
+
+  // Delete Modal
+  'delete.title': 'Xóa nguồn',
+  'delete.cannotUndo': 'Hành động này không thể hoàn tác',
+  'delete.confirmMessage':
+    'Bạn có chắc chắn muốn xóa {sourceName}? Tất cả tài liệu liên quan sẽ bị xóa vĩnh viễn khỏi cơ sở kiến thức của bạn.',
+  'delete.cancel': 'Hủy',
+  'delete.confirm': 'Xóa nguồn',
 
   // Chat
   'chat.title': 'Giao diện trò chuyện',
