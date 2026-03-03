@@ -1,8 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
+import { setupAuth } from '@/utils/auth/setupAuth';
+
+import '@/utils/env';
 import App from './App';
-import '@/utils/env'; // Validate environment variables
+
+setupAuth();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

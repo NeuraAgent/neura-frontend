@@ -30,6 +30,27 @@ export const useSocket = ({
 }: UseSocketProps) => {
   const [isConnected, setIsConnected] = useState(false);
   const streamingResponseRef = useRef('');
+  const callbacksRef = useRef({
+    onMessageReceived,
+    onLoadingChange,
+    onStreamingChange,
+    onStreamingResponseChange,
+  });
+
+  // Update callbacks ref without triggering reconnection
+  useEffect(() => {
+    callbacksRef.current = {
+      onMessageReceived,
+      onLoadingChange,
+      onStreamingChange,
+      onStreamingResponseChange,
+    };
+  }, [
+    onMessageReceived,
+    onLoadingChange,
+    onStreamingChange,
+    onStreamingResponseChange,
+  ]);
 
   useEffect(() => {
     const initSocket = async () => {
@@ -39,9 +60,9 @@ export const useSocket = ({
 
         // Setup event listeners
         socketService.onExecutionStarted(() => {
-          onStreamingChange(true);
+          callbacksRef.current.onStreamingChange(true);
           streamingResponseRef.current = '';
-          onStreamingResponseChange('');
+          callbacksRef.current.onStreamingResponseChange('');
         });
 
         socketService.onAgentThinking(() => {
@@ -54,42 +75,40 @@ export const useSocket = ({
 
         socketService.onResponseChunk(data => {
           streamingResponseRef.current += data.chunk;
-          onStreamingResponseChange(streamingResponseRef.current);
+          callbacksRef.current.onStreamingResponseChange(
+            streamingResponseRef.current
+          );
         });
 
         socketService.onExecutionComplete(data => {
-          onLoadingChange(false);
-          onStreamingChange(false);
-          isSendingRef.current = false; // Release the lock
+          callbacksRef.current.onLoadingChange(false);
+          callbacksRef.current.onStreamingChange(false);
+          isSendingRef.current = false;
 
-          // Use streaming response if available, otherwise fallback to complete response
           const aiResponse =
             streamingResponseRef.current ||
             data.result.llmOutput ||
             'No response received';
 
           const assistantMessage = createAssistantMessage(aiResponse);
-          onMessageReceived(assistantMessage);
+          callbacksRef.current.onMessageReceived(assistantMessage);
 
-          // Clear streaming response for next message
           streamingResponseRef.current = '';
-          onStreamingResponseChange('');
+          callbacksRef.current.onStreamingResponseChange('');
 
-          // Trigger credit balance refresh
           window.dispatchEvent(new CustomEvent('refreshCreditBalance'));
         });
 
         socketService.onExecutionError(data => {
-          onLoadingChange(false);
-          onStreamingChange(false);
-          isSendingRef.current = false; // Release the lock
+          callbacksRef.current.onLoadingChange(false);
+          callbacksRef.current.onStreamingChange(false);
+          isSendingRef.current = false;
 
           const errorMessage = createErrorMessage(data.error);
-          onMessageReceived(errorMessage);
+          callbacksRef.current.onMessageReceived(errorMessage);
 
-          // Clear streaming response on error
           streamingResponseRef.current = '';
-          onStreamingResponseChange('');
+          callbacksRef.current.onStreamingResponseChange('');
         });
       } catch (error) {
         console.error('Failed to connect to Socket.IO:', error);
@@ -99,17 +118,10 @@ export const useSocket = ({
 
     initSocket();
 
-    // Cleanup on unmount
     return () => {
       socketService.disconnect();
     };
-  }, [
-    onMessageReceived,
-    onLoadingChange,
-    onStreamingChange,
-    onStreamingResponseChange,
-    isSendingRef,
-  ]);
+  }, [isSendingRef]);
 
   return { isConnected };
 };

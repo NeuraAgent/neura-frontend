@@ -6,7 +6,7 @@
  * and backup the original Dashboard.tsx
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import 'katex/dist/katex.min.css';
 
@@ -62,6 +62,23 @@ const Dashboard: React.FC = () => {
   const { selectedModel, setSelectedModel } = useModelSelector();
   const { copiedIndex, copyToClipboard } = useClipboard();
 
+  // Memoized callbacks for socket
+  const handleMessageReceived = useCallback((message: Message) => {
+    setMessages(prev => [...prev, message]);
+  }, []);
+
+  const handleLoadingChange = useCallback((loading: boolean) => {
+    setIsLoading(loading);
+  }, []);
+
+  const handleStreamingChange = useCallback((streaming: boolean) => {
+    setIsStreaming(streaming);
+  }, []);
+
+  const handleStreamingResponseChange = useCallback((response: string) => {
+    setStreamingResponse(response);
+  }, []);
+
   const { sendMessage, isSendingRef } = useMessageSender({
     onMessageAdd: message => setMessages(prev => [...prev, message]),
     onLoadingChange: setIsLoading,
@@ -72,10 +89,10 @@ const Dashboard: React.FC = () => {
   });
 
   useSocket({
-    onMessageReceived: message => setMessages(prev => [...prev, message]),
-    onLoadingChange: setIsLoading,
-    onStreamingChange: setIsStreaming,
-    onStreamingResponseChange: setStreamingResponse,
+    onMessageReceived: handleMessageReceived,
+    onLoadingChange: handleLoadingChange,
+    onStreamingChange: handleStreamingChange,
+    onStreamingResponseChange: handleStreamingResponseChange,
     isSendingRef,
   });
 

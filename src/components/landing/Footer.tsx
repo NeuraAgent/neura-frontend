@@ -1,25 +1,27 @@
-import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import type { FC, MouseEvent } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-import Logo from '@/components/Logo';
 import { useLocale } from '@/contexts/LocaleContext';
 
-const Footer: React.FC = () => {
+import { BrandSection } from './components/BrandSection';
+import { FooterLink } from './components/FooterLink';
+import { FooterSection } from './components/FooterSection';
+import { StatusBadge } from './components/StatusBadge';
+
+const Footer: FC = () => {
   const { t } = useLocale();
   const currentYear = new Date().getFullYear();
   const location = useLocation();
   const navigate = useNavigate();
 
   const handleSectionClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
+    e: MouseEvent<HTMLAnchorElement>,
     sectionId: string
   ) => {
     e.preventDefault();
 
-    // If we're not on the landing page, navigate there first
     if (location.pathname !== '/') {
       navigate('/', { replace: false });
-      // Wait for navigation to complete, then scroll
       setTimeout(() => {
         const element = document.getElementById(sectionId);
         if (element) {
@@ -27,7 +29,6 @@ const Footer: React.FC = () => {
         }
       }, 100);
     } else {
-      // Already on landing page, just scroll
       const element = document.getElementById(sectionId);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
@@ -54,139 +55,85 @@ const Footer: React.FC = () => {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-16 mb-16">
-          {/* Brand block - premium anchor */}
           <div className="md:col-span-4">
-            <div className="group">
-              <Logo className="mb-6 transition-all duration-300 group-hover:scale-[1.02]" />
-            </div>
-            <p className="text-[#AAB0C4] text-sm leading-relaxed mb-6 max-w-sm">
-              {t('landing.footer.tagline')}
-            </p>
-            {/* Gradient accent line - brand signature */}
-            <div className="relative w-20 h-1 rounded-full overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-blue-500 to-violet-500" />
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            </div>
+            <BrandSection tagline={t('landing.footer.tagline')} />
           </div>
 
-          {/* Product */}
           <div className="md:col-span-2">
-            <h3 className="text-[#F5F7FF] font-semibold text-xs uppercase tracking-[0.1em] mb-5 opacity-90">
-              {t('landing.footer.product')}
-            </h3>
-            <ul className="space-y-3.5">
+            <FooterSection title={t('landing.footer.product')}>
               <li>
-                <a
+                <FooterLink
                   href="#features"
                   onClick={e => handleSectionClick(e, 'features')}
-                  className="group inline-flex items-center text-[#7B8199] hover:text-cyan-400 transition-all duration-200 text-sm"
                 >
-                  <span className="group-hover:translate-x-1 transition-transform duration-200">
-                    {t('landing.footer.features')}
-                  </span>
-                </a>
+                  {t('landing.footer.features')}
+                </FooterLink>
               </li>
               <li>
-                <a
+                <FooterLink
                   href="#pricing"
                   onClick={e => handleSectionClick(e, 'pricing')}
-                  className="group inline-flex items-center text-[#7B8199] hover:text-cyan-400 transition-all duration-200 text-sm"
                 >
-                  <span className="group-hover:translate-x-1 transition-transform duration-200">
-                    {t('landing.footer.pricing')}
-                  </span>
-                </a>
+                  {t('landing.footer.pricing')}
+                </FooterLink>
               </li>
               <li>
-                <Link
-                  to="/neura/signup"
-                  className="group inline-flex items-center text-[#7B8199] hover:text-cyan-400 transition-all duration-200 text-sm"
-                >
-                  <span className="group-hover:translate-x-1 transition-transform duration-200">
-                    {t('landing.footer.signup')}
-                  </span>
-                </Link>
+                <FooterLink to="/neura/signup">
+                  {t('landing.footer.signup')}
+                </FooterLink>
               </li>
               <li>
-                <Link
-                  to="/neura/login"
-                  className="group inline-flex items-center text-[#7B8199] hover:text-cyan-400 transition-all duration-200 text-sm"
-                >
-                  <span className="group-hover:translate-x-1 transition-transform duration-200">
-                    {t('landing.footer.login')}
-                  </span>
-                </Link>
+                <FooterLink to="/neura/login">
+                  {t('landing.footer.login')}
+                </FooterLink>
               </li>
-            </ul>
+            </FooterSection>
           </div>
 
-          {/* Developers */}
           <div className="md:col-span-3">
-            <h3 className="text-[#F5F7FF] font-semibold text-xs uppercase tracking-[0.1em] mb-5 opacity-90">
-              {t('landing.footer.developers')}
-            </h3>
-            <ul className="space-y-3.5">
+            <FooterSection title={t('landing.footer.developers')}>
               <li>
-                <Link
-                  to="/docs"
-                  className="group inline-flex items-center text-[#7B8199] hover:text-cyan-400 transition-all duration-200 text-sm"
-                >
-                  <span className="group-hover:translate-x-1 transition-transform duration-200">
-                    {t('landing.footer.documentation')}
-                  </span>
-                </Link>
+                <FooterLink to="/docs">
+                  {t('landing.footer.documentation')}
+                </FooterLink>
               </li>
               <li>
-                <span className="inline-flex items-center text-[#4B5563] cursor-not-allowed text-sm opacity-50">
-                  <span>{t('landing.footer.apiReference')}</span>
-                </span>
+                <FooterLink disabled>
+                  {t('landing.footer.apiReference')}
+                </FooterLink>
               </li>
               <li>
-                <span className="inline-flex items-center text-[#4B5563] cursor-not-allowed text-sm opacity-50">
-                  <span>{t('landing.footer.guides')}</span>
-                </span>
+                <FooterLink disabled>{t('landing.footer.guides')}</FooterLink>
               </li>
               <li>
-                <span className="inline-flex items-center text-[#4B5563] cursor-not-allowed text-sm opacity-50">
-                  <span>{t('landing.footer.systemStatus')}</span>
-                </span>
+                <FooterLink disabled>
+                  {t('landing.footer.systemStatus')}
+                </FooterLink>
               </li>
-            </ul>
+            </FooterSection>
           </div>
 
-          {/* Legal */}
           <div className="md:col-span-3">
-            <h3 className="text-[#F5F7FF] font-semibold text-xs uppercase tracking-[0.1em] mb-5 opacity-90">
-              {t('landing.footer.legal')}
-            </h3>
-            <ul className="space-y-3.5">
+            <FooterSection title={t('landing.footer.legal')}>
               <li>
-                <span className="inline-flex items-center text-[#4B5563] cursor-not-allowed text-sm opacity-50">
-                  <span>{t('landing.footer.terms')}</span>
-                </span>
+                <FooterLink disabled>{t('landing.footer.terms')}</FooterLink>
               </li>
               <li>
-                <span className="inline-flex items-center text-[#4B5563] cursor-not-allowed text-sm opacity-50">
-                  <span>{t('landing.footer.privacy')}</span>
-                </span>
+                <FooterLink disabled>{t('landing.footer.privacy')}</FooterLink>
               </li>
               <li>
-                <span className="inline-flex items-center text-[#4B5563] cursor-not-allowed text-sm opacity-50">
-                  <span>{t('landing.footer.security')}</span>
-                </span>
+                <FooterLink disabled>{t('landing.footer.security')}</FooterLink>
               </li>
               <li>
-                <span className="inline-flex items-center text-[#4B5563] cursor-not-allowed text-sm opacity-50">
-                  <span>{t('landing.footer.compliance')}</span>
-                </span>
+                <FooterLink disabled>
+                  {t('landing.footer.compliance')}
+                </FooterLink>
               </li>
-            </ul>
+            </FooterSection>
           </div>
         </div>
 
-        {/* Bottom section - premium divider and meta */}
         <div className="relative pt-10 mt-4">
-          {/* Enhanced gradient divider */}
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
           <div className="absolute top-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent blur-sm" />
 
@@ -195,22 +142,8 @@ const Footer: React.FC = () => {
               &copy; {currentYear} {t('landing.footer.copyright')}
             </p>
 
-            {/* Premium status badge */}
             <div className="flex items-center gap-4">
-              <div className="group relative flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#0F1428]/60 backdrop-blur-xl border border-white/10 hover:border-emerald-500/30 transition-all duration-300">
-                {/* Glow effect on hover */}
-                <div className="absolute inset-0 rounded-full bg-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                {/* Animated status dot */}
-                <div className="relative">
-                  <div className="w-2 h-2 rounded-full bg-emerald-400" />
-                  <div className="absolute inset-0 w-2 h-2 rounded-full bg-emerald-400 animate-ping opacity-75" />
-                </div>
-
-                <span className="relative text-xs font-medium text-[#7B8199] group-hover:text-[#AAB0C4] transition-colors duration-300">
-                  {t('landing.footer.allSystemsOperational')}
-                </span>
-              </div>
+              <StatusBadge label={t('landing.footer.allSystemsOperational')} />
             </div>
           </div>
         </div>
