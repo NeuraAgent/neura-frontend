@@ -32,7 +32,6 @@ const en = {
   'nav.chat': 'Chat',
   'nav.logout': 'Logout',
   'nav.language': 'Language',
-  'nav.profile': 'Profile',
   'nav.settings': 'Settings',
   'nav.signout': 'Sign out',
 
@@ -520,7 +519,6 @@ const vi = {
   'nav.chat': 'Trò chuyện',
   'nav.logout': 'Đăng xuất',
   'nav.language': 'Ngôn ngữ',
-  'nav.profile': 'Hồ sơ',
   'nav.settings': 'Cài đặt',
   'nav.signout': 'Đăng xuất',
 

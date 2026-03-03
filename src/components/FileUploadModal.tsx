@@ -9,6 +9,7 @@ import {
   FileUploadResult,
 } from '@/services/s3StorageService';
 import userFileService from '@/services/userFileService';
+import { useIntroTourStore } from '@/stores/introTourStore';
 import { useUserStore } from '@/stores/userStore';
 import {
   formatFileToMarkdown,
@@ -33,10 +34,18 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
   onSuccess,
 }) => {
   const { user, isAuthenticated, setFileIds, getFileIds } = useUserStore();
+  const { isActive: isTourActive } = useIntroTourStore();
   const [selectedFiles, setSelectedFiles] = useState<FileWithProgress[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadResults, setUploadResults] = useState<FileUploadResult[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Close modal if tour becomes active
+  useEffect(() => {
+    if (isTourActive && isOpen && !isUploading) {
+      onClose();
+    }
+  }, [isTourActive, isOpen, isUploading, onClose]);
 
   // Dispatch modal state events
   useEffect(() => {

@@ -18,7 +18,6 @@ function getFrontendToken(): string {
       console.error(
         '❌ VITE_FRONTEND_JWT_TOKEN not found in environment variables'
       );
-      console.log('Available env vars:', Object.keys(import.meta.env));
     }
     throw new Error('Frontend JWT token not configured');
   }

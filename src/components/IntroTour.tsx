@@ -39,6 +39,9 @@ const IntroTour: React.FC<IntroTourProps> = ({ enabled = true }) => {
   const { isActive, currentStep, setIsActive, setCurrentStep } =
     useIntroTourStore();
   const [position, setPosition] = useState({ top: 0, left: 0 });
+  const [actualPlacement, setActualPlacement] = useState<
+    'top' | 'bottom' | 'left' | 'right'
+  >('bottom');
   const [spotlightPosition, setSpotlightPosition] =
     useState<SpotlightPosition | null>(null);
   const [dontShowAgain, setDontShowAgain] = useState(false);
@@ -105,7 +108,7 @@ const IntroTour: React.FC<IntroTourProps> = ({ enabled = true }) => {
     });
 
     // Calculate popover position with intelligent fallback
-    const gap = 20;
+    const gap = 64; // Significantly increased gap for comfortable spacing
     let top = 0;
     let left = 0;
     let finalPlacement = placement;
@@ -189,17 +192,20 @@ const IntroTour: React.FC<IntroTourProps> = ({ enabled = true }) => {
     }
 
     // Final viewport clamping as safety net
-    const padding = 16;
+    const padding = 32; // Increased padding from edges
+    const minLeftMargin = 120; // Increased minimum left margin for better spacing
+
     top = Math.max(
       padding,
       Math.min(top, window.innerHeight - popoverRect.height - padding)
     );
     left = Math.max(
-      padding,
+      Math.max(padding, minLeftMargin), // Use larger of padding or minLeftMargin
       Math.min(left, window.innerWidth - popoverRect.width - padding)
     );
 
     setPosition({ top, left });
+    setActualPlacement(finalPlacement as 'top' | 'bottom' | 'left' | 'right');
   }, [currentStep, steps]);
 
   useEffect(() => {
@@ -282,18 +288,48 @@ const IntroTour: React.FC<IntroTourProps> = ({ enabled = true }) => {
 
   // Get arrow icon based on placement
   const getArrowIcon = (placement: string, colorClass = 'text-white') => {
-    const iconClass = `w-7 h-7 ${colorClass} animate-bounce`;
+    const iconClass = `w-7 h-7 ${colorClass}`;
+    const animationClass =
+      placement === 'left' || placement === 'right'
+        ? 'animate-bounce-horizontal'
+        : 'animate-bounce';
+
     switch (placement) {
       case 'top':
-        return <ArrowDown className={iconClass} strokeWidth={2.5} />;
+        return (
+          <ArrowUp
+            className={`${iconClass} ${animationClass}`}
+            strokeWidth={2.5}
+          />
+        );
       case 'bottom':
-        return <ArrowUp className={iconClass} strokeWidth={2.5} />;
+        return (
+          <ArrowDown
+            className={`${iconClass} ${animationClass}`}
+            strokeWidth={2.5}
+          />
+        );
       case 'left':
-        return <ArrowRight className={iconClass} strokeWidth={2.5} />;
+        return (
+          <ArrowLeft
+            className={`${iconClass} ${animationClass}`}
+            strokeWidth={2.5}
+          />
+        );
       case 'right':
-        return <ArrowLeft className={iconClass} strokeWidth={2.5} />;
+        return (
+          <ArrowRight
+            className={`${iconClass} ${animationClass}`}
+            strokeWidth={2.5}
+          />
+        );
       default:
-        return <ArrowDown className={iconClass} strokeWidth={2.5} />;
+        return (
+          <ArrowDown
+            className={`${iconClass} ${animationClass}`}
+            strokeWidth={2.5}
+          />
+        );
     }
   };
 
@@ -380,26 +416,26 @@ const IntroTour: React.FC<IntroTourProps> = ({ enabled = true }) => {
           className="fixed z-[10001] pointer-events-none transition-all duration-500"
           style={{
             top:
-              step.placement === 'top'
-                ? `${spotlightPosition.top + spotlightPosition.height + 16}px`
-                : step.placement === 'bottom'
-                  ? `${spotlightPosition.top - 40}px`
-                  : `${spotlightPosition.top + spotlightPosition.height / 2 - 12}px`,
+              actualPlacement === 'top'
+                ? `${spotlightPosition.top - 44}px` // Closer to target, away from tooltip
+                : actualPlacement === 'bottom'
+                  ? `${spotlightPosition.top + spotlightPosition.height + 16}px` // Closer to target
+                  : `${spotlightPosition.top + spotlightPosition.height / 2 - 14}px`,
             left:
-              step.placement === 'left'
-                ? `${spotlightPosition.left + spotlightPosition.width + 16}px`
-                : step.placement === 'right'
-                  ? `${spotlightPosition.left - 40}px`
-                  : `${spotlightPosition.left + spotlightPosition.width / 2 - 12}px`,
+              actualPlacement === 'left'
+                ? `${spotlightPosition.left - 44}px` // Closer to target, away from tooltip
+                : actualPlacement === 'right'
+                  ? `${spotlightPosition.left + spotlightPosition.width + 16}px` // Closer to target
+                  : `${spotlightPosition.left + spotlightPosition.width / 2 - 14}px`,
             filter: 'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))',
           }}
         >
           <div className="relative">
             <div className="absolute inset-0 blur-sm opacity-50">
-              {getArrowIcon(step.placement || 'bottom', 'text-white')}
+              {getArrowIcon(actualPlacement, 'text-white')}
             </div>
             <div className="relative">
-              {getArrowIcon(step.placement || 'bottom', 'text-white')}
+              {getArrowIcon(actualPlacement, 'text-white')}
             </div>
           </div>
         </div>
@@ -566,8 +602,23 @@ const IntroTour: React.FC<IntroTourProps> = ({ enabled = true }) => {
           }
         }
 
+        @keyframes bounce-horizontal {
+          0%, 100% {
+            transform: translateX(0);
+            animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+          }
+          50% {
+            transform: translateX(-25%);
+            animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+          }
+        }
+
         .animate-fade-in-scale {
           animation: fade-in-scale 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .animate-bounce-horizontal {
+          animation: bounce-horizontal 1s infinite;
         }
 
         [data-tour] {

@@ -1,9 +1,9 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { oidcService } from '@/services/oidcService';
+import { apiClient } from '@/utils/apiClient';
 
 const OAuthCallback: React.FC = () => {
   const navigate = useNavigate();
@@ -22,15 +22,10 @@ const OAuthCallback: React.FC = () => {
 
         if (user && user.profile) {
           try {
-            const apiGatewayUrl =
-              import.meta.env.VITE_API_URL || 'http://localhost:9999';
-            const response = await axios.post(
-              `${apiGatewayUrl}/api/auth/oauth/google`,
-              {
-                idToken: user.id_token,
-                accessToken: user.access_token,
-              }
-            );
+            const response = await apiClient.post('/api/auth/oauth/google', {
+              idToken: user.id_token,
+              accessToken: user.access_token,
+            });
 
             if (response?.data?.success) {
               // Store JWT tokens from auth-service

@@ -127,6 +127,35 @@ const Dashboard: React.FC = () => {
     };
   }, [showModelDropdown]);
 
+  // Close user menu when clicking outside or pressing ESC
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showUserMenu) {
+        const target = event.target as HTMLElement;
+        // Check if click is outside the user menu and the user button
+        if (!target.closest('.user-menu-container')) {
+          setShowUserMenu(false);
+        }
+      }
+    };
+
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && showUserMenu) {
+        setShowUserMenu(false);
+      }
+    };
+
+    if (showUserMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscKey);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscKey);
+    };
+  }, [showUserMenu]);
+
   // Listen for upload modal state changes
   useEffect(() => {
     const handleModalOpen = () => setIsUploadModalOpen(true);
@@ -195,7 +224,6 @@ const Dashboard: React.FC = () => {
         });
 
         socketService.onExecutionError(data => {
-          console.error('❌ Execution error:', data.error);
           setIsLoading(false);
           setIsStreaming(false);
 
@@ -384,24 +412,16 @@ const Dashboard: React.FC = () => {
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <Logo variant="icon" size="md" />
                 <div className="flex items-center space-x-1.5 sm:space-x-2">
-                  <button
-                    data-tour="settings-button"
-                    onClick={() =>
-                      !isTourActive && setShowUserMenu(!showUserMenu)
-                    }
-                    disabled={isTourActive}
-                    className={`w-7 h-7 sm:w-8 sm:h-8 bg-gray-300 rounded-full flex items-center justify-center ${isTourActive ? 'cursor-not-allowed opacity-70' : ''}`}
-                  >
-                    <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-600" />
-                  </button>
-                  <div className="relative">
+                  <div className="relative user-menu-container">
                     <button
-                      className={`flex items-center text-gray-600 p-1 ${isTourActive ? 'cursor-not-allowed opacity-70' : ''}`}
-                      onClick={() => !isTourActive && toggleSidebar()}
+                      data-tour="settings-button"
+                      onClick={() =>
+                        !isTourActive && setShowUserMenu(!showUserMenu)
+                      }
                       disabled={isTourActive}
-                      title="Collapse sidebar"
+                      className={`w-7 h-7 sm:w-8 sm:h-8 bg-gray-300 rounded-full flex items-center justify-center ${isTourActive ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
                     >
-                      <PanelLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                      <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-600" />
                     </button>
                     {showUserMenu && (
                       <div className="absolute right-0 mt-2 w-56 sm:w-64 bg-white rounded-lg shadow-lg py-2 z-10 border border-gray-200">
@@ -412,17 +432,9 @@ const Dashboard: React.FC = () => {
                           </div>
                           <LanguageSwitcher />
                         </div>
-
-                        <Link
-                          to="/profile"
-                          className="flex items-center px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-50"
-                        >
-                          <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 sm:mr-3" />
-                          {t('nav.profile')}
-                        </Link>
                         <Link
                           to="/neura/settings"
-                          className="flex items-center px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-50"
+                          className="flex items-center px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
                         >
                           <Settings className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 sm:mr-3" />
                           {t('nav.settings')}
@@ -430,13 +442,23 @@ const Dashboard: React.FC = () => {
                         <hr className="my-2" />
                         <button
                           onClick={handleLogout}
-                          className="flex items-center w-full px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-50"
+                          className="flex items-center w-full px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
                         >
                           <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 sm:mr-3" />
                           {t('nav.signout')}
                         </button>
                       </div>
                     )}
+                  </div>
+                  <div className="relative">
+                    <button
+                      className={`flex items-center text-gray-600 p-1 ${isTourActive ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
+                      onClick={() => !isTourActive && toggleSidebar()}
+                      disabled={isTourActive}
+                      title="Collapse sidebar"
+                    >
+                      <PanelLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -456,7 +478,7 @@ const Dashboard: React.FC = () => {
               <button
                 onClick={() => !isTourActive && handleClearConversation()}
                 disabled={isTourActive}
-                className={`text-xs sm:text-sm text-gray-500 hover:text-gray-700 px-4 sm:px-8 py-2.5 sm:py-[12px] rounded mb-4 sm:mb-[30px] bg-[#F8F7F6] transition-colors w-full sm:w-auto ${isTourActive ? 'cursor-not-allowed opacity-70' : ''}`}
+                className={`text-xs sm:text-sm text-gray-500 hover:text-gray-700 px-4 sm:px-8 py-2.5 sm:py-[12px] rounded mb-4 sm:mb-[30px] bg-[#F8F7F6] transition-colors w-full sm:w-auto ${isTourActive ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
               >
                 {t('dashboard.clearConversation')} ({messages.length})
               </button>
@@ -472,7 +494,7 @@ const Dashboard: React.FC = () => {
               <button
                 onClick={() => !isTourActive && toggleSidebar()}
                 disabled={isTourActive}
-                className={`p-2 hover:bg-gray-100 rounded-lg transition-colors ${isTourActive ? 'cursor-not-allowed opacity-70' : ''}`}
+                className={`p-2 hover:bg-gray-100 rounded-lg transition-colors ${isTourActive ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
                 title="Expand sidebar"
               >
                 <PanelRight className="w-5 h-5 text-gray-600" />
@@ -504,7 +526,7 @@ const Dashboard: React.FC = () => {
               <button
                 onClick={() => !isTourActive && handleClearConversation()}
                 disabled={isTourActive}
-                className={`p-2 hover:bg-gray-100 rounded-lg transition-colors mt-auto ${isTourActive ? 'cursor-not-allowed opacity-70' : ''}`}
+                className={`p-2 hover:bg-gray-100 rounded-lg transition-colors mt-auto ${isTourActive ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
                 title="Clear conversation"
               >
                 <Trash2 className="w-5 h-5 text-gray-500" />
@@ -518,7 +540,7 @@ const Dashboard: React.FC = () => {
       {!isSidebarOpen && (
         <button
           onClick={toggleSidebar}
-          className="fixed top-4 left-4 z-20 p-2.5 bg-white border border-gray-200 rounded-lg shadow-sm lg:hidden"
+          className="fixed top-4 left-4 z-20 p-2.5 bg-white border border-gray-200 rounded-lg shadow-sm lg:hidden cursor-pointer"
         >
           <PanelRight className="w-5 h-5 text-gray-600" />
         </button>
@@ -631,7 +653,7 @@ const Dashboard: React.FC = () => {
                               </div>
                               <div className="flex items-center gap-2 mt-3 pt-2 border-t border-gray-50">
                                 <button
-                                  className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-600"
+                                  className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-600 cursor-pointer"
                                   onClick={() =>
                                     handleCopyMessage(message.content, index)
                                   }
@@ -785,7 +807,7 @@ const Dashboard: React.FC = () => {
                         setInsufficientCredits(false);
                         setCreditError(null);
                       }}
-                      className="mt-2 text-sm font-medium text-red-800 hover:text-red-900 underline"
+                      className="mt-2 text-sm font-medium text-red-800 hover:text-red-900 underline cursor-pointer"
                     >
                       {t('credits.purchaseMore') || 'Purchase More Credits'} →
                     </button>
@@ -795,7 +817,7 @@ const Dashboard: React.FC = () => {
                       setInsufficientCredits(false);
                       setCreditError(null);
                     }}
-                    className="text-red-400 hover:text-red-600"
+                    className="text-red-400 hover:text-red-600 cursor-pointer"
                   >
                     <svg
                       className="w-5 h-5"
@@ -865,7 +887,7 @@ const Dashboard: React.FC = () => {
                           setShowModelDropdown(!showModelDropdown)
                         }
                         disabled={isTourActive}
-                        className={`p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors ${isTourActive ? 'cursor-not-allowed opacity-70' : ''}`}
+                        className={`p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors ${isTourActive ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -893,7 +915,7 @@ const Dashboard: React.FC = () => {
                                 key={option.value}
                                 disabled={!option?.enabled}
                                 onClick={() => handleModelSelect(option.value)}
-                                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center space-x-2 ${
+                                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center space-x-2 cursor-pointer ${
                                   selectedModel === option.value
                                     ? 'bg-gray-100 text-gray-800'
                                     : 'text-gray-700'
@@ -922,7 +944,7 @@ const Dashboard: React.FC = () => {
                       className={`p-2 rounded-lg transition-colors flex items-center justify-center ${
                         isLoading || isTourActive || !inputMessage.trim()
                           ? 'bg-gray-200 cursor-not-allowed text-gray-400'
-                          : 'bg-[#6B6B6B] hover:bg-gray-800 text-white'
+                          : 'bg-[#6B6B6B] hover:bg-gray-800 text-white cursor-pointer'
                       }`}
                     >
                       {isLoading ? (

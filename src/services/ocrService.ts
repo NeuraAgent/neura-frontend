@@ -28,24 +28,12 @@ class OCRService {
     prompt: string = 'Extract all the text from this document page:',
     maxTokens: number = 2000
   ): Promise<OCRResponse> {
-    console.log('🔍 [OCR] Starting PDF text extraction');
-    console.log(`📄 [OCR] Total pages to process: ${pdfImages.length}`);
-    console.log(`💬 [OCR] Prompt: ${prompt}`);
-    console.log(`🎯 [OCR] Max tokens: ${maxTokens}`);
-    console.log(
-      '⚡ [OCR] Processing pages sequentially to avoid payload size limits'
-    );
-
     try {
       const results: OCRPageResult[] = [];
       let totalTokens = 0;
 
       // Process pages one by one to avoid 413 Payload Too Large
       for (const pdfImage of pdfImages) {
-        console.log(
-          `📤 [OCR] Processing page ${pdfImage.page_number}/${pdfImages.length}`
-        );
-
         try {
           const response = await apiClient.post('/api/ocr/extract-text', {
             image_base64: pdfImage.image_base64,
@@ -60,9 +48,6 @@ class OCRService {
               tokens_used: response.data.tokens_used || 0,
             });
             totalTokens += response.data.tokens_used || 0;
-            console.log(
-              `✅ [OCR] Page ${pdfImage.page_number}: ${response.data.extracted_text.length} chars, ${response.data.tokens_used} tokens`
-            );
           } else {
             console.error(
               `❌ [OCR] Page ${pdfImage.page_number} failed:`,
@@ -99,13 +84,6 @@ class OCRService {
         .join('\n\n');
 
       const successfulPages = results.filter(r => r.extracted_text).length;
-
-      console.log(
-        `✅ [OCR] Extraction complete: ${successfulPages}/${pdfImages.length} pages`
-      );
-      console.log(`🔢 [OCR] Total tokens used: ${totalTokens}`);
-      console.log(`📝 [OCR] Total text length: ${fullText.length} chars`);
-
       return {
         success: successfulPages > 0,
         total_pages: pdfImages.length,
@@ -145,22 +123,12 @@ class OCRService {
     tokens_used: number;
     error?: string;
   }> {
-    console.log('🔍 [OCR] Starting single image text extraction');
-    console.log(`📏 [OCR] Image base64 length: ${imageBase64.length} chars`);
-
     try {
-      console.log('📤 [OCR] Sending request to /api/ocr/extract-text');
       const response = await apiClient.post('/api/ocr/extract-text', {
         image_base64: imageBase64,
         prompt,
         max_tokens: maxTokens,
       });
-
-      console.log('✅ [OCR] Image extraction successful');
-      console.log(
-        `📝 [OCR] Extracted text length: ${response.data.extracted_text?.length || 0} chars`
-      );
-      console.log(`🔢 [OCR] Tokens used: ${response.data.tokens_used}`);
 
       return response.data;
     } catch (error: any) {
@@ -183,10 +151,8 @@ class OCRService {
     model: string;
     endpoint: string;
   }> {
-    console.log('🏥 [OCR] Checking OCR service health');
     try {
       const response = await apiClient.get('/api/ocr/health');
-      console.log('✅ [OCR] Health check passed:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ [OCR] Health check failed:', error);

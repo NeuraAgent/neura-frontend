@@ -102,13 +102,16 @@ const SourcesManager: React.FC<SourcesManagerProps> = ({
   // Listen for upload modal event from collapsed sidebar
   useEffect(() => {
     const handleOpenUploadModal = () => {
-      setShowUploadModal(true);
+      // Don't open modal if tour is active
+      if (!isTourActive) {
+        setShowUploadModal(true);
+      }
     };
     window.addEventListener('openUploadModal', handleOpenUploadModal);
     return () => {
       window.removeEventListener('openUploadModal', handleOpenUploadModal);
     };
-  }, []);
+  }, [isTourActive]);
 
   const loadSources = async (isRefresh?: boolean) => {
     setLoading(true);

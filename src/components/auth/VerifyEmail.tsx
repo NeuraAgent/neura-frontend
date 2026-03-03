@@ -1,8 +1,8 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
-import { API_GATEWAY_ENDPOINTS, BASE_URLS } from '@/constants/apiEndpoints';
+import { API_GATEWAY_ENDPOINTS } from '@/constants/apiEndpoints';
+import { apiClient } from '@/utils/apiClient';
 
 const VerifyEmail: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -23,8 +23,8 @@ const VerifyEmail: React.FC = () => {
       }
 
       try {
-        const response = await axios.get(
-          `${BASE_URLS.API_GATEWAY}${API_GATEWAY_ENDPOINTS.AUTH}/verify-email?token=${token}`
+        const response = await apiClient.get(
+          `${API_GATEWAY_ENDPOINTS.AUTH}/verify-email?token=${token}`
         );
 
         if (response.data.success) {
