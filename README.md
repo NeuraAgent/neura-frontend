@@ -335,7 +335,7 @@ Developed by the Neura team
 
 ## 📞 Support
 
-For support, please contact [your-email@example.com]
+For support, please contact [vanhoa.bui2628@gmail.com]
 
 ---
 
