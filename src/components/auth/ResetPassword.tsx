@@ -4,12 +4,14 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 import Logo from '@/components/Logo';
 import { useLocale } from '@/contexts/LocaleContext';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { authService } from '@/services/authService';
 
 const ResetPassword: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { t } = useLocale();
+  const { handleError } = useErrorHandler();
 
   const [token, setToken] = useState<string>('');
   const [password, setPassword] = useState('');
@@ -77,10 +79,14 @@ const ResetPassword: React.FC = () => {
         );
       }
     } catch (err: any) {
-      setError(
-        err.response?.data?.message ||
-          'An unexpected error occurred. Please try again.'
-      );
+      const errorMessage = handleError(err, {
+        showToast: false,
+        defaultMessage: 'An unexpected error occurred. Please try again.',
+      });
+
+      if (errorMessage) {
+        setError(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }

@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Logo from '@/components/Logo';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocale } from '@/contexts/LocaleContext';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 
 interface SimpleSignUpFormData {
   firstName: string;
@@ -46,6 +47,7 @@ const SignUp: React.FC = () => {
 
   const { signUp } = useAuth();
   const { t } = useLocale();
+  const { handleError } = useErrorHandler();
   const navigate = useNavigate();
 
   // Calculate password strength
@@ -163,8 +165,15 @@ const SignUp: React.FC = () => {
           setError(response.message || 'Đăng ký thất bại. Vui lòng thử lại.');
         }
       }
-    } catch {
-      setError('Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.');
+    } catch (err: any) {
+      const errorMessage = handleError(err, {
+        showToast: false,
+        defaultMessage: 'Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.',
+      });
+
+      if (errorMessage) {
+        setError(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }

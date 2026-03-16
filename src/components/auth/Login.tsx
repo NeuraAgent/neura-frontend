@@ -5,6 +5,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Logo from '@/components/Logo';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocale } from '@/contexts/LocaleContext';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -15,11 +16,33 @@ const Login: React.FC = () => {
 
   const { login } = useAuth();
   const { t } = useLocale();
+  const { handleError } = useErrorHandler();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Get the intended destination or default to /neura
-  const from = location.state?.from?.pathname || '/neura';
+  // Get the intended destination from:
+  // 1. Location state (from ProtectedRoute)
+  // 2. SessionStorage (from apiClient logout)
+  // 3. Default to /neura
+  const getRedirectPath = () => {
+    // First check location state
+    if (location.state?.from?.pathname) {
+      return location.state.from.pathname;
+    }
+
+    // Then check sessionStorage
+    const storedPath = sessionStorage.getItem('redirect_after_login');
+    if (storedPath) {
+      // Clear it after reading
+      sessionStorage.removeItem('redirect_after_login');
+      return storedPath;
+    }
+
+    // Default to neura app
+    return '/neura';
+  };
+
+  const from = getRedirectPath();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,10 +56,20 @@ const Login: React.FC = () => {
         // Redirect to intended destination
         navigate(from, { replace: true });
       } else {
+        // Show error inline (not toast, as this is validation error)
         setError(response.message || 'Login failed. Please try again.');
       }
-    } catch {
-      setError('An unexpected error occurred. Please try again.');
+    } catch (err: any) {
+      // Use error handler hook - it will check if already handled by interceptor
+      const errorMessage = handleError(err, {
+        showToast: false, // Don't show toast, show inline error instead
+        defaultMessage: 'An unexpected error occurred. Please try again.',
+      });
+
+      // Only set inline error if not handled by interceptor
+      if (errorMessage) {
+        setError(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }

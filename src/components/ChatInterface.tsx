@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import MessageInput from '@/components/MessageInput';
 import MessageList from '@/components/MessageList';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLogout } from '@/hooks/useLogout';
 import { ChatMessage } from '@/types';
 import { env } from '@/utils/env';
 
@@ -22,18 +23,15 @@ const ChatInterface: React.FC = () => {
   const wsRef = useRef<WebSocket | null>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+  const { logout } = useLogout();
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      // Close WebSocket connection
-      if (wsRef.current) {
-        wsRef.current.close();
-      }
-    } catch (error) {
-      console.error('Logout error:', error);
+  const handleLogout = () => {
+    // Close WebSocket connection
+    if (wsRef.current) {
+      wsRef.current.close();
     }
+    logout('User clicked logout button');
   };
 
   // Close user menu when clicking outside

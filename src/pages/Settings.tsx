@@ -32,12 +32,14 @@ export default function Settings() {
     const fetchPlans = async () => {
       try {
         setLoadingPlans(true);
-        const data = await paymentService.getSubscriptionPlans();
-        const sortedPlans = data.sort(
-          (a, b) =>
-            parseFloat(a.price.toString()) - parseFloat(b.price.toString())
-        );
-        setPlans(sortedPlans);
+        const result = await paymentService.getSubscriptionPlans();
+        if (result.success && result.data) {
+          const sortedPlans = result.data.sort(
+            (a, b) =>
+              parseFloat(a.price.toString()) - parseFloat(b.price.toString())
+          );
+          setPlans(sortedPlans);
+        }
       } catch (error) {
         console.error('Failed to fetch subscription plans:', error);
       } finally {

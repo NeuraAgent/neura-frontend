@@ -6,6 +6,7 @@ import userFileService from '@/services/userFileService';
 import { useIntroTourStore } from '@/stores/introTourStore';
 import { useUserStore } from '@/stores/userStore';
 import { type Source } from '@/types';
+import { RequestManager } from '@/utils/api';
 
 import FileUploadModal from './FileUploadModal';
 
@@ -89,6 +90,7 @@ const SourcesManager: React.FC<SourcesManagerProps> = ({
 }) => {
   const { t } = useLocale();
   const { isActive: isTourActive } = useIntroTourStore();
+  const { isAuthenticated } = useUserStore();
   const [sources, setSources] = useState<Source[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm] = useState('');
@@ -96,8 +98,11 @@ const SourcesManager: React.FC<SourcesManagerProps> = ({
   const { setFileIds, getFileIds } = useUserStore();
 
   useEffect(() => {
-    loadSources();
-  }, [isToggleLeftMenu]);
+    // Only load sources if user is authenticated and not on auth page
+    if (isAuthenticated && !RequestManager.isOnAuthPage()) {
+      loadSources();
+    }
+  }, [isToggleLeftMenu, isAuthenticated]);
 
   // Listen for upload modal event from collapsed sidebar
   useEffect(() => {
@@ -115,43 +120,46 @@ const SourcesManager: React.FC<SourcesManagerProps> = ({
 
   const loadSources = async (isRefresh?: boolean) => {
     setLoading(true);
-    try {
-      const response = await userFileService.getUserFiles();
-      const userFiles = response.data?.files || [];
 
-      const sourcesData = userFiles.map((file: any) => ({
-        id: file.fileId,
-        name: file.originalName,
-        subject: file.metadata?.subject || 'General',
-        file_name: file.fileName,
-        upload_date: file.uploadedAt,
-        file_type: file.fileType,
-        file_size: file.fileSize,
-        type: 'file' as const,
-        checked: false,
-        s3Key: file.s3Key,
-        s3Url: file.s3Url,
-        metadata: file.metadata,
-      }));
+    const response = await userFileService.getUserFiles();
 
-      if (isRefresh || !isToggleLeftMenu) {
-        const selectedFileIds = sourcesData.map(source => source.id);
-        setFileIds(selectedFileIds);
-        onSourcesChange(selectedFileIds);
-      }
-      setSources(sourcesData);
-
-      // Pass sources to parent component
-      if (onSourcesLoad) {
-        onSourcesLoad(sourcesData);
-      }
-    } catch (error) {
-      console.error('Failed to load user files:', error);
+    if (!response.success || !response.data) {
+      // Error already handled by middleware
       setSources([]);
-      setFileIds([]);
-    } finally {
       setLoading(false);
+      return;
     }
+
+    const userFiles = response.data.data?.files || [];
+
+    const sourcesData = userFiles.map((file: any) => ({
+      id: file.fileId,
+      name: file.originalName,
+      subject: file.metadata?.subject || 'General',
+      file_name: file.fileName,
+      upload_date: file.uploadedAt,
+      file_type: file.fileType,
+      file_size: file.fileSize,
+      type: 'file' as const,
+      checked: false,
+      s3Key: file.s3Key,
+      s3Url: file.s3Url,
+      metadata: file.metadata,
+    }));
+
+    if (isRefresh || !isToggleLeftMenu) {
+      const selectedFileIds = sourcesData.map(source => source.id);
+      setFileIds(selectedFileIds);
+      onSourcesChange(selectedFileIds);
+    }
+    setSources(sourcesData);
+
+    // Pass sources to parent component
+    if (onSourcesLoad) {
+      onSourcesLoad(sourcesData);
+    }
+
+    setLoading(false);
   };
 
   const handleSourceToggle = (sourceId: string) => {

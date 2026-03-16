@@ -4,10 +4,11 @@
  */
 
 import { Zap, AlertCircle } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useLocale } from '@/contexts/LocaleContext';
+import { useApiData } from '@/hooks/useApiData';
 import {
   paymentService,
   type CreditBalance as CreditBalanceType,
@@ -15,52 +16,19 @@ import {
 
 export function FloatingCreditIndicator() {
   const { t } = useLocale();
-  const [balance, setBalance] = useState<CreditBalanceType | null>(null);
-  const [loading, setLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
 
-  // Get token from localStorage
-  const token = localStorage.getItem('auth_token');
+  // Memoize the API function to prevent infinite re-renders
+  const getCreditBalance = useCallback(
+    () => paymentService.getCreditBalance(),
+    []
+  );
 
-  const fetchBalance = useCallback(async () => {
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const data = await paymentService.getCreditBalance();
-      setBalance(data);
-    } catch (err) {
-      console.error('Error fetching credit balance:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [token]);
-
-  useEffect(() => {
-    if (token) {
-      fetchBalance();
-    } else {
-      setLoading(false);
-    }
-  }, [token, fetchBalance]);
-
-  // Listen for credit balance refresh events
-  useEffect(() => {
-    const handleRefresh = () => {
-      if (token) {
-        fetchBalance();
-      }
-    };
-
-    window.addEventListener('refreshCreditBalance', handleRefresh);
-
-    return () => {
-      window.removeEventListener('refreshCreditBalance', handleRefresh);
-    };
-  }, [token, fetchBalance]);
+  // Use the reusable hook for API data fetching
+  const { data: balance, loading } = useApiData<CreditBalanceType>({
+    apiFn: getCreditBalance,
+    refreshEvent: 'refreshCreditBalance',
+  });
 
   if (loading) {
     return (
@@ -70,7 +38,7 @@ export function FloatingCreditIndicator() {
     );
   }
 
-  if (!balance || !token) {
+  if (!balance) {
     return null;
   }
 

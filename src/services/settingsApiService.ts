@@ -3,6 +3,7 @@
  * Handles communication with the settings service for chunk configuration
  */
 
+import { SETTINGS_API_ENDPOINTS } from '@/constants/api';
 import { BASE_URLS } from '@/constants/apiEndpoints';
 import { apiClient } from '@/utils/apiClient';
 
@@ -55,7 +56,7 @@ class SettingsApiService {
   async getChunkSettings(): Promise<ChunkSettings> {
     try {
       const response = await settingApi.get<ApiResponse<ChunkSettings>>(
-        '/api/settings/chunk'
+        SETTINGS_API_ENDPOINTS.CHUNK_SETTINGS
       );
 
       // Axios response structure: response.data contains the actual data

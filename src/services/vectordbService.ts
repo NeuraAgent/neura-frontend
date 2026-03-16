@@ -1,3 +1,4 @@
+import { VECTORDB_API_ENDPOINTS } from '@/constants/api';
 import {
   VectorDocument,
   EmbedAndStoreRequest,
@@ -56,7 +57,7 @@ class VectorDBService {
       };
 
       const response: any = await vectorApi.post(
-        '/api/vectordb/embed-and-store',
+        VECTORDB_API_ENDPOINTS.EMBED_AND_STORE,
         requestPayload
       );
 
@@ -83,7 +84,7 @@ class VectorDBService {
       };
 
       const response: any = await vectorApi.post(
-        '/api/vectordb/bulk-embed-and-store',
+        VECTORDB_API_ENDPOINTS.BULK_EMBED_AND_STORE,
         requestPayload
       );
 

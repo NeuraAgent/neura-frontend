@@ -2,7 +2,6 @@ import React, {
   createContext,
   useContext,
   useEffect,
-  useState,
   useCallback,
   type ReactNode,
 } from 'react';
@@ -36,14 +35,12 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { user, isAuthenticated, isLoading, setUser, setLoading, clearUser } =
     useUserStore();
-  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
     const initializeAuth = async () => {
-      const { user, token } = await AuthInitializer.initialize();
+      const { user } = await AuthInitializer.initialize();
       if (user) {
         setUser(user);
-        setToken(token);
       }
       setLoading(false);
     };
@@ -58,7 +55,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const response = await AuthActions.login(email, password);
         if (response.success && response.data) {
           setUser(response.data.user);
-          setToken(response.data.token);
         }
         return response;
       } finally {
@@ -74,7 +70,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await AuthActions.logout();
     } finally {
       clearUser();
-      setToken(null);
       setLoading(false);
     }
   }, [clearUser, setLoading]);
@@ -102,7 +97,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     async (oauthUser: unknown): Promise<void> => {
       const user = await AuthActions.setOAuthUser(oauthUser as OAuthUser);
       setUser(user);
-      setToken((oauthUser as OAuthUser).access_token);
     },
     [setUser]
   );
@@ -113,7 +107,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const value: AuthContextValue = {
     user,
-    token,
     isAuthenticated,
     isLoading,
     login,

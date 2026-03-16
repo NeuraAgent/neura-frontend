@@ -15,8 +15,18 @@ export class SessionManager {
     // Clear cookies
     CookieManager.clearAuthCookies();
 
-    // Clear storage
+    // Clear storage (this clears ALL localStorage including Zustand stores)
     StorageManager.clearAllStorage();
+
+    // Explicitly clear Zustand persisted stores to prevent rehydration issues
+    // These are the keys used by Zustand persist middleware
+    try {
+      localStorage.removeItem('user-storage'); // userStore
+      localStorage.removeItem('auth_token'); // Legacy token key
+      localStorage.removeItem('refresh_token'); // Legacy refresh token key
+    } catch (error) {
+      console.error('Error clearing Zustand stores:', error);
+    }
 
     console.log('✅ Session cleared successfully');
   }
@@ -30,6 +40,15 @@ export class SessionManager {
 
     // Clear auth storage
     StorageManager.clearAuthStorage();
+
+    // Clear Zustand user store
+    try {
+      localStorage.removeItem('user-storage');
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('refresh_token');
+    } catch (error) {
+      console.error('Error clearing auth data:', error);
+    }
 
     console.log('✅ Auth data cleared successfully');
   }

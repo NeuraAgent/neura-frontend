@@ -11,102 +11,67 @@ import type {
 import { createApiClient } from '@/utils/apiClient';
 import { handleNetworkError, logError } from '@/utils/errorHandler';
 
-import { cookieService } from './cookieService';
-
-// Token storage keys
-const TOKEN_KEY = 'auth_token';
-const REFRESH_TOKEN_KEY = 'refresh_token';
-
-// Create axios instance with frontend authentication
 const api = createApiClient(BASE_URLS.API_GATEWAY);
 
 class AuthService {
-  /**
-   * Login user with email and password
-   */
   async login(email: string, password: string): Promise<LoginResponse> {
     try {
       const response: AxiosResponse<LoginResponse> = await api.post(
         GATEWAY_API_ENDPOINTS.AUTH_LOGIN,
-        {
-          email,
-          password,
-        }
+        { email, password },
+        { withCredentials: true }
       );
 
       const { data } = response;
 
-      if (data.success && data.data) {
-        // Store tokens in localStorage
-        if (data.data.token) {
-          localStorage.setItem(TOKEN_KEY, data.data.token);
-        }
-        if (data.data.refresh_token) {
-          localStorage.setItem(REFRESH_TOKEN_KEY, data.data.refresh_token);
-        }
-
-        // Store user display data in cookie for UI purposes
-        cookieService.setUserDisplayData(data.data.user);
-      }
+      // User data will be set by the component using userStore
+      // Tokens are in HTTP-only cookies - frontend never touches them
 
       return data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Login', error);
 
-      if (error.response?.data) {
-        return error.response.data as LoginResponse;
+      if ((error as any).response?.data) {
+        return (error as any).response.data as LoginResponse;
       }
 
       return handleNetworkError() as LoginResponse;
     }
   }
 
-  /**
-   * Logout user
-   */
   async logout(): Promise<void> {
     try {
-      // Call logout endpoint to invalidate token on server
-      await api.post(GATEWAY_API_ENDPOINTS.AUTH_LOGOUT);
+      await api.post(
+        GATEWAY_API_ENDPOINTS.AUTH_LOGOUT,
+        {},
+        { withCredentials: true }
+      );
     } catch (error) {
       logError('Logout', error);
-    } finally {
-      // Clear tokens from localStorage
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(REFRESH_TOKEN_KEY);
-
-      // Clear user display data
-      cookieService.removeUserDisplayData();
     }
+    // User data will be cleared by the component using userStore
+    // Cookies are cleared by the backend
   }
 
-  /**
-   * Send forgot password request
-   */
   async forgotPassword(email: string): Promise<ForgotPasswordResponse> {
     try {
       const response: AxiosResponse<ForgotPasswordResponse> = await api.post(
         GATEWAY_API_ENDPOINTS.AUTH_FORGOT_PASSWORD,
-        {
-          email,
-        }
+        { email }
       );
 
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Forgot Password', error);
 
-      if (error.response?.data) {
-        return error.response.data as ForgotPasswordResponse;
+      if ((error as any).response?.data) {
+        return (error as any).response.data as ForgotPasswordResponse;
       }
 
       return handleNetworkError() as ForgotPasswordResponse;
     }
   }
 
-  /**
-   * Reset password with token
-   */
   async resetPassword(
     token: string,
     newPassword: string
@@ -114,27 +79,21 @@ class AuthService {
     try {
       const response: AxiosResponse<ForgotPasswordResponse> = await api.post(
         GATEWAY_API_ENDPOINTS.AUTH_RESET_PASSWORD,
-        {
-          token,
-          newPassword,
-        }
+        { token, newPassword }
       );
 
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Reset Password', error);
 
-      if (error.response?.data) {
-        return error.response.data as ForgotPasswordResponse;
+      if ((error as any).response?.data) {
+        return (error as any).response.data as ForgotPasswordResponse;
       }
 
       return handleNetworkError() as ForgotPasswordResponse;
     }
   }
 
-  /**
-   * Sign up new user
-   */
   async signUp(signUpData: SignUpRequest): Promise<SignUpResponse> {
     try {
       const response: AxiosResponse<SignUpResponse> = await api.post(
@@ -142,68 +101,30 @@ class AuthService {
         signUpData
       );
 
-      const { data } = response;
-
-      // Don't store user data during signup - user must verify email first
-      // User data will be stored after successful login
-
-      return data;
-    } catch (error: any) {
+      return response.data;
+    } catch (error: unknown) {
       logError('Sign Up', error);
 
-      if (error.response?.data) {
-        return error.response.data as SignUpResponse;
+      if ((error as any).response?.data) {
+        return (error as any).response.data as SignUpResponse;
       }
 
       return handleNetworkError() as SignUpResponse;
     }
   }
 
-  /**
-   * Get current user from cookie display data
-   */
-  getCurrentUser(): User | null {
-    try {
-      return cookieService.getUserDisplayData();
-    } catch (error) {
-      logError('Get Current User', error);
-      return null;
-    }
-  }
-
-  /**
-   * Check if user is authenticated based on display data
-   * Note: Actual authentication is handled by HTTP-only cookies
-   */
-  getToken(): string | null {
-    // HTTP-only cookies cannot be accessed via JavaScript
-    // Return null but authentication is handled automatically by cookies
-    return null;
-  }
-
-  /**
-   * Check if user is authenticated based on display data
-   * Note: Actual authentication is handled by HTTP-only cookies
-   */
-  isAuthenticated(): boolean {
-    const user = this.getCurrentUser();
-    return !!user; // Check if we have user display data
-  }
-
-  /**
-   * Refresh authentication token
-   */
   async refreshToken(): Promise<boolean> {
     try {
       const response: AxiosResponse<LoginResponse> = await api.post(
-        GATEWAY_API_ENDPOINTS.AUTH_REFRESH
+        GATEWAY_API_ENDPOINTS.AUTH_REFRESH,
+        {},
+        { withCredentials: true }
       );
 
       const { data } = response;
 
       if (data.success && data.data) {
-        // Update user display data - cookies are updated automatically by server
-        cookieService.setUserDisplayData(data.data.user);
+        // User data will be updated by the component using userStore
         return true;
       }
 
@@ -214,30 +135,9 @@ class AuthService {
     }
   }
 
-  /**
-   * Check if user appears to be authenticated
-   * Note: With HTTP-only cookies, we can't check token expiry from client side
-   */
-  shouldRefreshToken(): boolean {
-    // Server handles token validation and refresh automatically
-    return false;
-  }
-
-  /**
-   * Auto refresh token if needed
-   * Note: With HTTP-only cookies, this is handled automatically by the server
-   */
-  async autoRefreshToken(): Promise<boolean> {
-    // HTTP-only cookies handle refresh automatically
-    return true;
-  }
-
-  /**
-   * Update user's preferred language
-   */
   async updateLanguage(
     language: string
-  ): Promise<{ success: boolean; message: string }> {
+  ): Promise<{ success: boolean; message: string; user?: User }> {
     try {
       const response: AxiosResponse<{
         success: boolean;
@@ -249,31 +149,25 @@ class AuthService {
 
       const { data } = response;
 
-      if (data.success && data.data) {
-        // Update user display data with new language preference
-        cookieService.setUserDisplayData(data.data.user);
-      }
-
       return {
         success: data.success,
         message: data.message,
+        user: data.data?.user,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Update Language', error);
 
-      if (error.response?.data) {
-        return error.response.data;
+      if ((error as any).response?.data) {
+        return (error as any).response.data;
       }
 
       return handleNetworkError();
     }
   }
-  /**
-   * Update user's intro completion status
-   */
+
   async updateIntroStatus(
     hasCompletedIntro: boolean
-  ): Promise<{ success: boolean; message: string }> {
+  ): Promise<{ success: boolean; message: string; user?: User }> {
     try {
       const response: AxiosResponse<{
         success: boolean;
@@ -285,20 +179,16 @@ class AuthService {
 
       const { data } = response;
 
-      if (data.success && data.data) {
-        // Update user display data with new intro status
-        cookieService.setUserDisplayData(data.data.user);
-      }
-
       return {
         success: data.success,
         message: data.message,
+        user: data.data?.user,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Update Intro Status', error);
 
-      if (error.response?.data) {
-        return error.response.data;
+      if ((error as any).response?.data) {
+        return (error as any).response.data;
       }
 
       return handleNetworkError();

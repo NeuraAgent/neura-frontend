@@ -1,9 +1,6 @@
-import { apiClient } from '@/utils/apiClient';
-
-import { authService } from './authService';
-import toastService from './toastService';
-
-const api = apiClient;
+import { FILE_ENDPOINTS } from '@/constants/api';
+import { ApiMiddleware } from '@/utils/api';
+import type { ApiMiddlewareResult } from '@/utils/api';
 
 // Types for user file management
 export interface UploadedFile {
@@ -65,91 +62,68 @@ export interface ApiResponse<T = any> {
 
 class UserFileService {
   /**
-   * Add a new uploaded file to user's file list
+   * Add file - NO TRY-CATCH NEEDED
    */
-  async addFile(fileInfo: AddFileRequest): Promise<ApiResponse<UploadedFile>> {
-    try {
-      const response = await api.post('/api/files/add', fileInfo);
-      return response.data;
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || 'Failed to add file to your profile';
-      toastService.error(errorMessage);
-      if (error.response?.data) {
-        return error.response.data as ApiResponse<UploadedFile>;
+  async addFile(
+    fileInfo: AddFileRequest
+  ): Promise<ApiMiddlewareResult<UploadedFile>> {
+    return ApiMiddleware.post<UploadedFile>(
+      FILE_ENDPOINTS.FILES_ADD,
+      fileInfo,
+      undefined,
+      {
+        requiresAuth: true,
+        showErrorToast: true,
       }
-      throw error;
-    }
+    );
   }
 
   /**
-   * Remove a file from user's file list
+   * Remove file - NO TRY-CATCH NEEDED
    */
-  async removeFile(fileId: string): Promise<ApiResponse<{ fileId: string }>> {
-    try {
-      const response = await api.delete('/api/files/remove', {
+  async removeFile(
+    fileId: string
+  ): Promise<ApiMiddlewareResult<{ fileId: string }>> {
+    return ApiMiddleware.delete<{ fileId: string }>(
+      FILE_ENDPOINTS.FILES_REMOVE,
+      {
         data: { fileId },
-      });
-      return response.data;
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || 'Failed to remove file';
-      toastService.error(errorMessage);
-      if (error.response?.data) {
-        return error.response.data as ApiResponse;
+      },
+      {
+        requiresAuth: true,
+        showErrorToast: true,
       }
-      throw error;
-    }
+    );
   }
 
   /**
-   * Get all uploaded files for the authenticated user
+   * Get all user files - NO TRY-CATCH NEEDED
    */
-  async getUserFiles(): Promise<UserFilesResponse> {
-    try {
-      const response = await api.get('/api/files');
-      return response.data;
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || 'Failed to fetch your files';
-      toastService.error(errorMessage);
-      if (error.response?.data) {
-        return error.response.data as UserFilesResponse;
+  async getUserFiles(): Promise<ApiMiddlewareResult<UserFilesResponse>> {
+    return ApiMiddleware.get<UserFilesResponse>(
+      FILE_ENDPOINTS.FILES,
+      undefined,
+      {
+        requiresAuth: true,
+        showErrorToast: false,
       }
-      throw error;
-    }
+    );
   }
 
   /**
-   * Get a specific file by ID for the authenticated user
+   * Get file by ID - NO TRY-CATCH NEEDED
    */
-  async getFileById(fileId: string): Promise<ApiResponse<UploadedFile>> {
-    try {
-      const response = await api.get(`/api/files/${fileId}`);
-      return response.data;
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || 'Failed to fetch file details';
-      toastService.error(errorMessage);
-      if (error.response?.data) {
-        return error.response.data as ApiResponse<UploadedFile>;
+  async getFileById(
+    fileId: string
+  ): Promise<ApiMiddlewareResult<UploadedFile>> {
+    return ApiMiddleware.get<UploadedFile>(
+      FILE_ENDPOINTS.FILES_BY_ID(fileId),
+      undefined,
+      {
+        requiresAuth: true,
+        showErrorToast: true,
       }
-      throw error;
-    }
-  }
-
-  /**
-   * Check if user is authenticated
-   */
-  isAuthenticated(): boolean {
-    return authService.isAuthenticated();
-  }
-
-  /**
-   * Get current user info
-   */
-  getCurrentUser() {
-    return authService.getCurrentUser();
+    );
   }
 }
 

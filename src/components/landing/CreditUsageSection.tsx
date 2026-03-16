@@ -25,11 +25,13 @@ const CreditUsageSection: React.FC = () => {
   useEffect(() => {
     const fetchPricingRules = async () => {
       try {
-        const data = await paymentService.getPricingRules();
-        const activeRules = data
-          .filter(rule => rule.isActive)
-          .sort((a, b) => a.creditsPerRequest - b.creditsPerRequest);
-        setPricingRules(activeRules);
+        const result = await paymentService.getPricingRules();
+        if (result.success && result.data) {
+          const activeRules = result.data
+            .filter(rule => rule.isActive)
+            .sort((a, b) => a.creditsPerRequest - b.creditsPerRequest);
+          setPricingRules(activeRules);
+        }
       } catch (error) {
         console.error('Failed to fetch pricing rules:', error);
       } finally {

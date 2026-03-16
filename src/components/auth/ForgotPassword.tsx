@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import Logo from '@/components/Logo';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocale } from '@/contexts/LocaleContext';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 
 const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -14,6 +15,7 @@ const ForgotPassword: React.FC = () => {
 
   const { forgotPassword } = useAuth();
   const { t } = useLocale();
+  const { handleError } = useErrorHandler();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,8 +32,15 @@ const ForgotPassword: React.FC = () => {
           response.message || 'Failed to send reset email. Please try again.'
         );
       }
-    } catch {
-      setError('An unexpected error occurred. Please try again.');
+    } catch (err: any) {
+      const errorMessage = handleError(err, {
+        showToast: false,
+        defaultMessage: 'An unexpected error occurred. Please try again.',
+      });
+
+      if (errorMessage) {
+        setError(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }

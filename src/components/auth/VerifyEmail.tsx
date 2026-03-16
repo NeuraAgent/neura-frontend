@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { API_GATEWAY_ENDPOINTS } from '@/constants/apiEndpoints';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { apiClient } from '@/utils/apiClient';
 
 const VerifyEmail: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { handleError } = useErrorHandler();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
     'loading'
   );
@@ -39,11 +41,15 @@ const VerifyEmail: React.FC = () => {
           setMessage(response.data.message || 'Verification failed');
         }
       } catch (error: any) {
-        setStatus('error');
-        setMessage(
-          error.response?.data?.message ||
-            'An error occurred during verification'
-        );
+        const errorMessage = handleError(error, {
+          showToast: false,
+          defaultMessage: 'An error occurred during verification',
+        });
+
+        if (errorMessage) {
+          setStatus('error');
+          setMessage(errorMessage);
+        }
       }
     };
 

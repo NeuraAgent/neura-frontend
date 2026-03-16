@@ -14,6 +14,7 @@ import { FloatingCreditIndicator } from '@/components/FloatingCreditIndicator';
 import IntroTour from '@/components/IntroTour';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocale } from '@/contexts/LocaleContext';
+import { useLogout } from '@/hooks/useLogout';
 import { useIntroTourStore } from '@/stores/introTourStore';
 import { useUserStore } from '@/stores/userStore';
 
@@ -34,7 +35,8 @@ import { Message } from './dashboard/types';
 import { resetTextareaHeight } from './dashboard/utils/textareaUtils';
 
 const Dashboard: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+  const { logout } = useLogout();
   const { t } = useLocale();
   const { isActive: isTourActive } = useIntroTourStore();
   const { getFileIds } = useUserStore();
@@ -151,12 +153,8 @@ const Dashboard: React.FC = () => {
     });
   };
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
+  const handleLogout = () => {
+    logout('User clicked logout button');
   };
 
   const handleClearConversation = () => {

@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '@/contexts/AuthContext';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { oidcService } from '@/services/oidcService';
 import { apiClient } from '@/utils/apiClient';
 
 const OAuthCallback: React.FC = () => {
   const navigate = useNavigate();
   const { setOAuthUser } = useAuth();
+  const { handleError } = useErrorHandler();
   const [isProcessing, setIsProcessing] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,9 +53,16 @@ const OAuthCallback: React.FC = () => {
             } else {
               throw new Error(response.data.message || 'Authentication failed');
             }
-          } catch (authError) {
-            console.error('Auth service verification failed:', authError);
-            throw new Error('Failed to verify with authentication service');
+          } catch (authError: any) {
+            // Use error handler - will check if already handled by interceptor
+            const errorMessage = handleError(authError, {
+              showToast: false,
+              defaultMessage: 'Failed to verify with authentication service',
+            });
+
+            if (errorMessage) {
+              throw new Error(errorMessage);
+            }
           }
         } else {
           throw new Error('No user data received from OAuth provider');

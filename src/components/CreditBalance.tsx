@@ -3,9 +3,10 @@
  * Ultra-clean, minimal status indicator focused on usage clarity
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 
 import { useLocale } from '@/contexts/LocaleContext';
+import { useApiData } from '@/hooks/useApiData';
 import {
   paymentService,
   type CreditBalance as CreditBalanceType,
@@ -13,54 +14,23 @@ import {
 
 export function CreditBalance() {
   const { t } = useLocale();
-  const [balance, setBalance] = useState<CreditBalanceType | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // Get token from localStorage
-  const token = localStorage.getItem('auth_token');
+  // Memoize the API function to prevent infinite re-renders
+  const getCreditBalance = useCallback(() => {
+    return paymentService.getCreditBalance();
+  }, []);
 
-  const fetchBalance = useCallback(async () => {
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await paymentService.getCreditBalance();
-      setBalance(data);
-    } catch (err) {
-      console.error('Error fetching credit balance:', err);
-      setError('Failed to load credit balance');
-    } finally {
-      setLoading(false);
-    }
-  }, [token]);
-
-  useEffect(() => {
-    if (token) {
-      fetchBalance();
-    } else {
-      setLoading(false);
-    }
-  }, [token, fetchBalance]);
-
-  // Listen for credit balance refresh events
-  useEffect(() => {
-    const handleRefresh = () => {
-      if (token) {
-        fetchBalance();
-      }
-    };
-
-    window.addEventListener('refreshCreditBalance', handleRefresh);
-
-    return () => {
-      window.removeEventListener('refreshCreditBalance', handleRefresh);
-    };
-  }, [token, fetchBalance]);
+  // Use the reusable hook for API data fetching
+  const {
+    data: balance,
+    loading,
+    error,
+    refetch,
+  } = useApiData<CreditBalanceType>({
+    apiFn: getCreditBalance,
+    errorMessage: 'Failed to load credit balance',
+    refreshEvent: 'refreshCreditBalance',
+  });
 
   if (loading) {
     return (
@@ -80,7 +50,7 @@ export function CreditBalance() {
           {error || 'No credit data available'}
         </p>
         <button
-          onClick={fetchBalance}
+          onClick={refetch}
           className="text-sm font-medium text-red-700 hover:text-red-800 transition-colors"
         >
           {t('common.retry')}
@@ -106,7 +76,7 @@ export function CreditBalance() {
     <div className="relative rounded-[18px] bg-gradient-to-br from-gray-50 via-white to-gray-50/50 p-6 border-0 shadow-sm hover:shadow-md transition-shadow duration-300">
       {/* Subtle refresh button - top right */}
       <button
-        onClick={fetchBalance}
+        onClick={refetch}
         className="absolute top-4 right-4 text-gray-300 hover:text-gray-500 transition-colors"
         title={t('common.refresh')}
         aria-label="Refresh credit balance"

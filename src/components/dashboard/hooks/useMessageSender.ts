@@ -43,9 +43,13 @@ export const useMessageSender = ({
       const creditCheck = await paymentService.checkCredits(
         CREDIT_CHECK_ESTIMATE
       );
-      if (!creditCheck.hasCredits) {
+      if (
+        creditCheck.success &&
+        creditCheck.data &&
+        !creditCheck.data.hasCredits
+      ) {
         onCreditError(
-          `Insufficient credits. You have ${creditCheck.available} credits but need at least ${creditCheck.required}.`
+          `Insufficient credits. You have ${creditCheck.data.available} credits but need at least ${creditCheck.data.required}.`
         );
         isSendingRef.current = false;
         return false;

@@ -3,10 +3,9 @@
  * Handles credit balance, calculations, and payment operations
  */
 
-import { apiClient } from '@/utils/apiClient';
-import { env } from '@/utils/env';
-
-const API_URL = env.VITE_API_URL;
+import { PAYMENT_ENDPOINTS } from '@/constants/api';
+import { ApiMiddleware } from '@/utils/api';
+import type { ApiMiddlewareResult } from '@/utils/api';
 
 export interface CreditBalance {
   totalCredits: number;
@@ -70,117 +69,212 @@ export interface SubscriptionPlan {
 
 class PaymentService {
   /**
-   * Get user's credit balance
+   * Get user's credit balance - NO TRY-CATCH NEEDED
    */
-  async getCreditBalance(): Promise<CreditBalance> {
-    try {
-      const response = await apiClient.get(
-        `${API_URL}/api/payment/credits/balance`
-      );
+  async getCreditBalance(): Promise<ApiMiddlewareResult<CreditBalance>> {
+    const result = await ApiMiddleware.get<{ data: CreditBalance }>(
+      PAYMENT_ENDPOINTS.CREDITS_BALANCE,
+      undefined,
+      {
+        requiresAuth: true,
+        showErrorToast: false,
+      }
+    );
 
-      return response.data.data;
-    } catch (error) {
-      console.error('Error fetching credit balance:', error);
-      throw error;
+    // Extract nested data
+    if (result.success && result.data) {
+      return {
+        success: true,
+        data: result.data.data,
+        error: null,
+      };
     }
+
+    return {
+      success: false,
+      data: null,
+      error: result.error,
+    };
   }
 
   /**
-   * Calculate credits required for a request
+   * Calculate credits required for a request - NO TRY-CATCH NEEDED
    */
   async calculateCredits(params: {
     model: string;
     serviceType: string;
     inputTokens?: number;
     outputTokens?: number;
-  }): Promise<CreditCalculation> {
-    try {
-      const response = await apiClient.post(
-        `${API_URL}/api/payment/credits/calculate`,
-        params
-      );
+  }): Promise<ApiMiddlewareResult<CreditCalculation>> {
+    const result = await ApiMiddleware.post<{ data: CreditCalculation }>(
+      PAYMENT_ENDPOINTS.CREDITS_CALCULATE,
+      params,
+      undefined,
+      {
+        requiresAuth: true,
+        showErrorToast: true,
+      }
+    );
 
-      return response.data.data;
-    } catch (error) {
-      console.error('Error calculating credits:', error);
-      throw error;
+    // Extract nested data
+    if (result.success && result.data) {
+      return {
+        success: true,
+        data: result.data.data,
+        error: null,
+      };
     }
+
+    return {
+      success: false,
+      data: null,
+      error: result.error,
+    };
   }
 
   /**
-   * Check if user has sufficient credits
+   * Check if user has sufficient credits - NO TRY-CATCH NEEDED
    */
-  async checkCredits(
-    credits: number
-  ): Promise<{ hasCredits: boolean; available: number; required: number }> {
-    try {
-      const response = await apiClient.post(
-        `${API_URL}/api/payment/credits/check`,
-        { credits }
-      );
+  async checkCredits(credits: number): Promise<
+    ApiMiddlewareResult<{
+      hasCredits: boolean;
+      available: number;
+      required: number;
+    }>
+  > {
+    const result = await ApiMiddleware.post<{
+      data: { hasCredits: boolean; available: number; required: number };
+    }>(PAYMENT_ENDPOINTS.CREDITS_CHECK, { credits }, undefined, {
+      requiresAuth: true,
+      showErrorToast: true,
+    });
 
-      return response.data.data;
-    } catch (error) {
-      console.error('Error checking credits:', error);
-      throw error;
+    // Extract nested data
+    if (result.success && result.data) {
+      return {
+        success: true,
+        data: result.data.data,
+        error: null,
+      };
     }
+
+    return {
+      success: false,
+      data: null,
+      error: result.error,
+    };
   }
 
   /**
-   * Get credit transaction history
+   * Get credit transaction history - NO TRY-CATCH NEEDED
    */
   async getCreditHistory(
     page: number = 1,
     limit: number = 20
-  ): Promise<{
-    transactions: CreditTransaction[];
-    pagination: {
-      page: number;
-      limit: number;
-      total: number;
-      totalPages: number;
+  ): Promise<
+    ApiMiddlewareResult<{
+      transactions: CreditTransaction[];
+      pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+      };
+    }>
+  > {
+    const result = await ApiMiddleware.get<{
+      data: {
+        transactions: CreditTransaction[];
+        pagination: {
+          page: number;
+          limit: number;
+          total: number;
+          totalPages: number;
+        };
+      };
+    }>(
+      `${PAYMENT_ENDPOINTS.CREDITS_HISTORY}?page=${page}&limit=${limit}`,
+      undefined,
+      {
+        requiresAuth: true,
+        showErrorToast: true,
+      }
+    );
+
+    // Extract nested data
+    if (result.success && result.data) {
+      return {
+        success: true,
+        data: result.data.data,
+        error: null,
+      };
+    }
+
+    return {
+      success: false,
+      data: null,
+      error: result.error,
     };
-  }> {
-    try {
-      const response = await apiClient.get(
-        `${API_URL}/api/payment/credits/history?page=${page}&limit=${limit}`
-      );
-
-      return response.data.data;
-    } catch (error) {
-      console.error('Error fetching credit history:', error);
-      throw error;
-    }
   }
 
   /**
-   * Get pricing rules
+   * Get pricing rules - NO TRY-CATCH NEEDED
    */
-  async getPricingRules(): Promise<PricingRule[]> {
-    try {
-      const response = await apiClient.get(
-        `${API_URL}/api/payment/pricing/rules`
-      );
-      return response.data.data || [];
-    } catch (error) {
-      console.error('Error fetching pricing rules:', error);
-      return [];
+  async getPricingRules(): Promise<ApiMiddlewareResult<PricingRule[]>> {
+    const result = await ApiMiddleware.get<{ data: PricingRule[] }>(
+      PAYMENT_ENDPOINTS.PRICING_RULES,
+      undefined,
+      {
+        requiresAuth: true,
+        showErrorToast: false,
+      }
+    );
+
+    // Extract nested data
+    if (result.success && result.data) {
+      return {
+        success: true,
+        data: result.data.data || [],
+        error: null,
+      };
     }
+
+    return {
+      success: false,
+      data: [],
+      error: result.error,
+    };
   }
 
   /**
-   * Get subscription plans
+   * Get subscription plans - NO TRY-CATCH NEEDED
    */
-  async getSubscriptionPlans(): Promise<SubscriptionPlan[]> {
-    try {
-      const response = await apiClient.get(
-        `${API_URL}/api/payment/subscriptions/plans`
-      );
-      return response.data.data || [];
-    } catch (error) {
-      console.error('Error fetching subscription plans:', error);
-      return [];
+  async getSubscriptionPlans(): Promise<
+    ApiMiddlewareResult<SubscriptionPlan[]>
+  > {
+    const result = await ApiMiddleware.get<{ data: SubscriptionPlan[] }>(
+      PAYMENT_ENDPOINTS.SUBSCRIPTIONS_PLANS,
+      undefined,
+      {
+        requiresAuth: true,
+        showErrorToast: false,
+      }
+    );
+
+    // Extract nested data
+    if (result.success && result.data) {
+      return {
+        success: true,
+        data: result.data.data || [],
+        error: null,
+      };
     }
+
+    return {
+      success: false,
+      data: [],
+      error: result.error,
+    };
   }
 
   /**

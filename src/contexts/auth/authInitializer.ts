@@ -8,30 +8,36 @@ import { UserMapper } from './userMapper';
 export class AuthInitializer {
   static async initialize(): Promise<{
     user: User | null;
-    token: string | null;
   }> {
     try {
       const persistedUser = useUserStore.getState().user;
 
       const oauthUser = await oidcService.getUser();
       if (oauthUser && !oauthUser.expired) {
-        const storedUser = authService.getCurrentUser();
-        const user = UserMapper.fromOAuth(oauthUser, storedUser, persistedUser);
-        return { user, token: oauthUser.access_token };
+        // With cookie-based auth, user data comes from userStore (populated from cookies)
+        const user = UserMapper.fromOAuth(
+          oauthUser,
+          persistedUser,
+          persistedUser
+        );
+        return { user };
       }
 
-      const storedUser = authService.getCurrentUser();
-      if (storedUser) {
-        const user = UserMapper.mergeWithPersisted(storedUser, persistedUser);
-        return { user, token: 'authenticated' };
+      // With cookie-based auth, user data comes from userStore (populated from cookies)
+      if (persistedUser) {
+        const user = UserMapper.mergeWithPersisted(
+          persistedUser,
+          persistedUser
+        );
+        return { user };
       }
 
-      return { user: null, token: null };
+      return { user: null };
     } catch (error) {
       console.error('Auth initialization error:', error);
       await authService.logout();
       await oidcService.removeUser();
-      return { user: null, token: null };
+      return { user: null };
     }
   }
 }

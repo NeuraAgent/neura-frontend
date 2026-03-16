@@ -1,3 +1,4 @@
+import { OCR_ENDPOINTS } from '@/constants/api';
 import { apiClient } from '@/utils/apiClient';
 
 export interface PDFImageData {
@@ -35,7 +36,7 @@ class OCRService {
       // Process pages one by one to avoid 413 Payload Too Large
       for (const pdfImage of pdfImages) {
         try {
-          const response = await apiClient.post('/api/ocr/extract-text', {
+          const response = await apiClient.post(OCR_ENDPOINTS.EXTRACT_TEXT, {
             image_base64: pdfImage.image_base64,
             prompt: `${prompt} (Page ${pdfImage.page_number})`,
             max_tokens: maxTokens,
@@ -124,7 +125,7 @@ class OCRService {
     error?: string;
   }> {
     try {
-      const response = await apiClient.post('/api/ocr/extract-text', {
+      const response = await apiClient.post(OCR_ENDPOINTS.EXTRACT_TEXT, {
         image_base64: imageBase64,
         prompt,
         max_tokens: maxTokens,
@@ -152,7 +153,7 @@ class OCRService {
     endpoint: string;
   }> {
     try {
-      const response = await apiClient.get('/api/ocr/health');
+      const response = await apiClient.get(OCR_ENDPOINTS.HEALTH);
       return response.data;
     } catch (error) {
       console.error('❌ [OCR] Health check failed:', error);
