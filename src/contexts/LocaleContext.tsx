@@ -1080,8 +1080,9 @@ export const LocaleProvider: React.FC<LocaleProviderProps> = ({ children }) => {
       if (savedLocale && (savedLocale === 'en' || savedLocale === 'vi')) {
         return savedLocale;
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error('Error loading locale from localStorage:', error);
+      /* empty */
     }
     return 'vi'; // Default to Vietnamese
   };
@@ -1099,16 +1100,14 @@ export const LocaleProvider: React.FC<LocaleProviderProps> = ({ children }) => {
       if (isAuthenticated) {
         try {
           await authService.updateLanguage(newLocale);
-        } catch (apiError) {
-          console.error(
-            'Failed to update language preference on server:',
-            apiError
-          );
-          // Don't fail the language switch if API call fails
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+          /* empty */
         }
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error('Error saving locale to localStorage:', error);
+      /* empty */
     }
   };
 

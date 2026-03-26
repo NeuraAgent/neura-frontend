@@ -57,8 +57,8 @@ export const useFileUpload = (
         onSuccess();
         handleClose();
       }, 2000);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error('Upload failed:', error);
       alert('Upload failed. Please try again.');
     } finally {
       setIsUploading(false);

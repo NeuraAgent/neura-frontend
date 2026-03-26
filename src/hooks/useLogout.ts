@@ -34,9 +34,6 @@ export const useLogout = () => {
         // 1. Call backend logout endpoint to blacklist token and clear HTTP-only cookies
         try {
           await authService.logout();
-          console.log(
-            '✅ Backend logout successful - token blacklisted, cookies cleared'
-          );
         } catch (error) {
           console.error('❌ Backend logout failed:', error);
           // Continue with client-side cleanup even if backend fails

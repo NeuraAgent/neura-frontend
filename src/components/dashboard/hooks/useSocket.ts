@@ -111,7 +111,6 @@ export const useSocket = ({
           callbacksRef.current.onStreamingResponseChange('');
         });
       } catch (error) {
-        console.error('Failed to connect to Socket.IO:', error);
         setIsConnected(false);
       }
     };

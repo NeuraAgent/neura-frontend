@@ -68,7 +68,6 @@ const OAuthCallback: React.FC = () => {
           throw new Error('No user data received from OAuth provider');
         }
       } catch (error) {
-        console.error('OAuth callback error:', error);
         setError(
           error instanceof Error ? error.message : 'Authentication failed'
         );

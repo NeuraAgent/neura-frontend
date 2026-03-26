@@ -183,7 +183,6 @@ export class ApiErrorHandler {
   } {
     // Skip canceled requests
     if (error?.isCanceled || error?.code === 'ERR_CANCELED') {
-      console.log('⚠️ Request was canceled');
       return { handled: true, errorInfo: {} };
     }
 

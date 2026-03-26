@@ -167,21 +167,8 @@ class S3StorageService {
         const command = new PutObjectCommand(uploadParams);
         try {
           await this.s3Client.send(command);
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (s3Error: any) {
-          console.error('❌ S3 upload failed:', s3Error);
-          console.error('Error name:', s3Error?.name);
-          console.error('Error message:', s3Error?.message);
-          console.error('Error code:', s3Error?.code);
-          console.error('Error stack:', s3Error?.stack);
-
-          // Check if it's a network/CORS error
-          if (
-            s3Error?.message?.includes('fetch') ||
-            s3Error?.message?.includes('CORS')
-          ) {
-            console.error('🚫 This appears to be a CORS/network error');
-          }
-
           // Fallback to mock mode
           return this.performMockUpload(file, onProgress);
         }

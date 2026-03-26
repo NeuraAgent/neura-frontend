@@ -253,7 +253,6 @@ const IntroTour: React.FC<IntroTourProps> = ({ enabled = true }) => {
     // Only call API if user checked "Don't show again"
     if (dontShowAgain) {
       authService.updateIntroStatus(true).catch(error => {
-        console.error('Failed to update intro status:', error);
         // Revert on error
         updateUser({ hasCompletedIntro: false });
       });

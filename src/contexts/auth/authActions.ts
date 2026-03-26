@@ -16,8 +16,8 @@ export class AuthActions {
     try {
       const response = await authService.login(email, password);
       return response;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error('Login error:', error);
       return {
         success: false,
         message: 'An unexpected error occurred during login.',
@@ -33,16 +33,17 @@ export class AuthActions {
       } else {
         await authService.logout();
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error('Logout error:', error);
+      /* empty */
     }
   }
 
   static async forgotPassword(email: string): Promise<ForgotPasswordResponse> {
     try {
       return await authService.forgotPassword(email);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error('Forgot password error:', error);
       return {
         success: false,
         message: 'An unexpected error occurred. Please try again.',
@@ -53,8 +54,8 @@ export class AuthActions {
   static async signUp(signUpData: SignUpRequest): Promise<SignUpResponse> {
     try {
       return await authService.signUp(signUpData);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error('Sign up error:', error);
       return {
         success: false,
         message: 'An unexpected error occurred during sign up.',
@@ -63,11 +64,11 @@ export class AuthActions {
   }
 
   static async setOAuthUser(oauthUser: OAuthUser): Promise<User> {
+    // eslint-disable-next-line no-useless-catch
     try {
       const user = UserMapper.fromOAuth(oauthUser, null, null);
       return user;
     } catch (error) {
-      console.error('Error setting OAuth user:', error);
       throw error;
     }
   }
@@ -75,8 +76,8 @@ export class AuthActions {
   static async isOAuthAuthenticated(): Promise<boolean> {
     try {
       return await oidcService.isAuthenticated();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error('Error checking OAuth authentication:', error);
       return false;
     }
   }

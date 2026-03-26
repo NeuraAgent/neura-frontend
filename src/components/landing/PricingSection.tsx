@@ -27,8 +27,9 @@ const PricingSection: FC = () => {
           );
           setPlans(sortedPlans);
         }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
-        console.error('Failed to fetch subscription plans:', error);
+        /* empty */
       } finally {
         setLoading(false);
       }

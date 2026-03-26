@@ -33,8 +33,8 @@ export class AuthInitializer {
       }
 
       return { user: null };
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error('Auth initialization error:', error);
       await authService.logout();
       await oidcService.removeUser();
       return { user: null };

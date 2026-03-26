@@ -58,7 +58,6 @@ export const useFileProcessor = ({
 
       return uploadResult;
     } catch (error) {
-      console.error(`Failed to process file ${file.name}:`, error);
       return {
         success: false,
         fileName: file.name,
@@ -146,7 +145,7 @@ export const useFileProcessor = ({
 
     onProgress(file.name, chunkProgress);
 
-    const chunkResult = await chunkService.chunkAndStoreFile(fileContent, {
+    await chunkService.chunkAndStoreFile(fileContent, {
       fileName: uploadResult.s3FileName,
       fileId,
       userId,
@@ -154,10 +153,6 @@ export const useFileProcessor = ({
       week: FILE_METADATA.DEFAULT_WEEK,
       title: file.name,
     });
-
-    if (!chunkResult?.success) {
-      console.error(`❌ Failed to chunk file ${file.name}:`, chunkResult.error);
-    }
   };
 
   const addToUserProfile = async (
@@ -184,11 +179,9 @@ export const useFileProcessor = ({
         },
       });
       setFileIds([...getFileIds(), fileId]);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error(
-        `⚠️ Failed to add file ${file.name} to user profile:`,
-        error
-      );
+      /* empty */
     }
   };
 

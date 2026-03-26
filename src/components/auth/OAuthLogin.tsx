@@ -15,7 +15,6 @@ const OAuthLogin: React.FC<OAuthLoginProps> = ({ onError, className = '' }) => {
     try {
       await oidcService.signinRedirect();
     } catch (error) {
-      console.error('OAuth login error:', error);
       const errorMessage =
         error instanceof Error ? error.message : 'OAuth login failed';
       onError?.(errorMessage);

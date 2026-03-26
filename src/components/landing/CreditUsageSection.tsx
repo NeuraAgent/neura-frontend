@@ -32,8 +32,9 @@ const CreditUsageSection: React.FC = () => {
             .sort((a, b) => a.creditsPerRequest - b.creditsPerRequest);
           setPricingRules(activeRules);
         }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
-        console.error('Failed to fetch pricing rules:', error);
+        /* empty */
       } finally {
         setLoading(false);
       }

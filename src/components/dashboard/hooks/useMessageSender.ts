@@ -79,7 +79,6 @@ export const useMessageSender = ({
 
       return true;
     } catch (error) {
-      console.error('Failed to send message:', error);
       onLoadingChange(false);
       isSendingRef.current = false; // Release the lock on error
 

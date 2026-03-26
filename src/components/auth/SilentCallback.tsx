@@ -11,8 +11,9 @@ const SilentCallback: React.FC = () => {
     const handleSilentCallback = async () => {
       try {
         await oidcService.signinSilentCallback();
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
-        console.error('Silent callback error:', error);
+        /* empty */
       }
     };
 

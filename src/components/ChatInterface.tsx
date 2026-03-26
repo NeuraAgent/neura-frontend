@@ -144,12 +144,10 @@ const ChatInterface: React.FC = () => {
 
   const handleSendMessage = (messageText: string) => {
     if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
-      console.error('❌ WebSocket not connected');
       return;
     }
 
     if (!sessionInfo) {
-      console.error('❌ Session info not available');
       return;
     }
 

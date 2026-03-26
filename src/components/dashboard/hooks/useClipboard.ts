@@ -20,8 +20,9 @@ export const useClipboard = () => {
       setTimeout(() => {
         setCopiedIndex(null);
       }, COPY_TIMEOUT_MS);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error('Failed to copy message:', error);
+      /* empty */
     }
   };
 
