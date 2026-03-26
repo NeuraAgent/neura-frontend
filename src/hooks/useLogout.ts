@@ -77,10 +77,6 @@ export const useLogout = () => {
         // 5. Clear user data from store (userStore handles persistence)
         clearUser();
 
-        // Note: HTTP-only cookies (auth_token, refresh_token) are cleared by the backend
-
-        console.log('✅ Client-side session cleared successfully');
-
         // 6. Store redirect path if provided and valid
         const currentPath = window.location.pathname;
         const pathToStore = redirectPath || redirectPathToStore || currentPath;

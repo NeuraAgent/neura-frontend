@@ -40,7 +40,6 @@ export class AxiosInterceptor {
     );
 
     this.isSetup = true;
-    console.log('✅ Axios interceptors setup complete');
   }
 
   /**
@@ -108,6 +107,5 @@ export class AxiosInterceptor {
     axiosInstance.interceptors.request.clear();
     axiosInstance.interceptors.response.clear();
     this.isSetup = false;
-    console.log('✅ Axios interceptors removed');
   }
 }

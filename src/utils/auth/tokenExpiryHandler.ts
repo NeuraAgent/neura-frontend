@@ -38,9 +38,6 @@ export class TokenExpiryHandler {
     } = options;
 
     try {
-      console.log('🔒 Handling token expiry...');
-
-      // Show notification if requested
       if (showNotification) {
         this.showExpiryNotification(message);
       }
@@ -125,8 +122,6 @@ export class TokenExpiryHandler {
    * Logout user manually
    */
   static logout(): void {
-    console.log('🚪 Logging out user...');
-
     SessionManager.logout();
     NavigationManager.navigateToLogin();
   }

@@ -66,24 +66,6 @@ export function createApiClient(baseURL?: string): AxiosInstance {
         });
       }
 
-      // DEV: Log cookies being sent
-      if (import.meta.env.DEV) {
-        const cookies = document.cookie
-          .split(';')
-          .map(c => c.trim())
-          .filter(c => c);
-        const authToken = cookies.find(c => c.startsWith('auth_token='));
-
-        console.log(
-          `🍪 [Request] ${config.method?.toUpperCase()} ${config.url}`
-        );
-        if (authToken) {
-          console.log('✅ auth_token present');
-        } else {
-          console.warn('⚠️ auth_token missing');
-        }
-      }
-
       // Add cache-busting headers for GET requests
       if (config.method?.toLowerCase() === 'get') {
         config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
@@ -99,7 +81,7 @@ export function createApiClient(baseURL?: string): AxiosInstance {
         }
         config.headers['x-frontend-auth'] = `Bearer ${frontendToken}`;
       } catch (error) {
-        if (import.meta.env.DEV) {
+        if (env.NODE_ENV === 'development') {
           console.error('❌ Failed to get frontend token:', error);
         }
       }
@@ -113,31 +95,7 @@ export function createApiClient(baseURL?: string): AxiosInstance {
 
   // Response interceptor
   api.interceptors.response.use(
-    (response: AxiosResponse) => {
-      // DEV: Check auth cookies after login
-      if (import.meta.env.DEV && response.config.url?.includes('/login')) {
-        console.log('🔐 [Login] Response status:', response.status);
-
-        const cookies = document.cookie.split(';').map(c => c.trim());
-        const hasAuthToken = cookies.some(c => c.startsWith('auth_token='));
-        const hasRefreshToken = cookies.some(c =>
-          c.startsWith('refresh_token=')
-        );
-
-        if (hasAuthToken && hasRefreshToken) {
-          console.log('✅ [Login] Auth cookies set successfully');
-        } else {
-          console.error('❌ [Login] Auth cookies NOT set');
-          console.error('   auth_token:', hasAuthToken ? 'present' : 'missing');
-          console.error(
-            '   refresh_token:',
-            hasRefreshToken ? 'present' : 'missing'
-          );
-        }
-      }
-
-      return response;
-    },
+    (response: AxiosResponse) => response,
     (error: AxiosError) => {
       return handleErrorResponse(error);
     }

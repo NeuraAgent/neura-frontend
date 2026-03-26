@@ -29,13 +29,11 @@ export function useErrorHandler() {
 
       // Skip if request was canceled (on auth pages)
       if (error?.isCanceled) {
-        console.log('⚠️ Request was canceled, skipping error handling');
         return null;
       }
 
       // Skip if error was already handled by the interceptor
       if (error?.isHandledByInterceptor) {
-        console.log('⚠️ Error already handled by interceptor, skipping');
         return null;
       }
 

@@ -17,7 +17,6 @@ export const LogoutHandler: FC = () => {
   useEffect(() => {
     // Register callback with API client
     const unregister = registerLogoutCallback((reason: string) => {
-      console.log('📢 Logout event received from API client:', reason);
       logout(reason);
     });
 

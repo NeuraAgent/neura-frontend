@@ -27,8 +27,6 @@ export class SessionManager {
     } catch (error) {
       console.error('Error clearing Zustand stores:', error);
     }
-
-    console.log('✅ Session cleared successfully');
   }
 
   /**
@@ -49,8 +47,6 @@ export class SessionManager {
     } catch (error) {
       console.error('Error clearing auth data:', error);
     }
-
-    console.log('✅ Auth data cleared successfully');
   }
 
   /**
