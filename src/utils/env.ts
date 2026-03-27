@@ -5,13 +5,13 @@ const envSchema = z.object({
   // Authentication API Configuration
   VITE_API_URL: z
     .string()
-    .url('VITE_API_URL must be a valid URL')
+    .min(1, 'VITE_API_URL cannot be empty')
     .describe('API base URL'),
 
   // WebSocket Configuration
   VITE_WEBSOCKET_URL: z
     .string()
-    .regex(/^wss?:\/\//, 'VITE_WEBSOCKET_URL must be a valid WebSocket URL')
+    .min(1, 'VITE_WEBSOCKET_URL cannot be empty')
     .describe('WebSocket server URL'),
 
   // Application Configuration

@@ -18,12 +18,14 @@ import {
 
 interface UseMessageSenderProps {
   onMessageAdd: (message: Message) => void;
+  onMessageUpdate?: (id: string, updates: Partial<Message>) => void;
   onLoadingChange: (isLoading: boolean) => void;
   onCreditError: (error: string) => void;
 }
 
 export const useMessageSender = ({
   onMessageAdd,
+  onMessageUpdate,
   onLoadingChange,
   onCreditError,
 }: UseMessageSenderProps) => {
@@ -35,40 +37,40 @@ export const useMessageSender = ({
       return false;
     }
 
-    // Set immediate blocking flag (synchronous, blocks before state updates)
+    // ... rest of checking logic
     isSendingRef.current = true;
 
     try {
-      // Check credits before sending
-      const creditCheck = await paymentService.checkCredits(
-        CREDIT_CHECK_ESTIMATE
-      );
-      if (
-        creditCheck.success &&
-        creditCheck.data &&
-        !creditCheck.data.hasCredits
-      ) {
-        onCreditError(
-          `Insufficient credits. You have ${creditCheck.data.available} credits but need at least ${creditCheck.data.required}.`
-        );
+      const creditCheck = await paymentService.checkCredits(CREDIT_CHECK_ESTIMATE);
+      if (creditCheck.success && creditCheck.data && !creditCheck.data.hasCredits) {
+        onCreditError(`Insufficient credits...`);
         isSendingRef.current = false;
         return false;
       }
-    } catch (error) {
-      console.warn('Failed to check credits, proceeding anyway:', error);
-      // Continue even if credit check fails - let backend handle it
-    }
+    } catch (e) {}
 
-    // Create and add user message
-    const userMessage = createUserMessage(params.content);
+    const displayMsg = params.displayContent || params.content;
+    const userMessage = createUserMessage(displayMsg, params.images);
     onMessageAdd(userMessage);
     onLoadingChange(true);
 
     try {
-      // Send via Socket.IO
+      let finalBackendContent = params.content;
+      if (params.getBackendContent) {
+        finalBackendContent = await params.getBackendContent();
+        
+        // Once background content is fetched (OCR done), update images to 'done'
+        if (onMessageUpdate && userMessage.id && params.images) {
+           const updatedImages = params.images.map(img => ({ ...img, status: 'done' as const }));
+           onMessageUpdate(userMessage.id, { images: updatedImages });
+        }
+      }
+
+      console.log('[Backend Payload Final Content - Verify Network Tab]:', finalBackendContent);
+
       await socketService.execute({
         version: 'v1.0',
-        query: params.content,
+        query: finalBackendContent,
         session_id: params.sessionId,
         user_id: params.userId,
         channel_id: 'frontend_channel',
@@ -80,17 +82,18 @@ export const useMessageSender = ({
       return true;
     } catch (error) {
       onLoadingChange(false);
-      isSendingRef.current = false; // Release the lock on error
+      isSendingRef.current = false;
+      
+      // On error, mark images as error
+      if (onMessageUpdate && userMessage.id && params.images) {
+         const updatedImages = params.images.map(img => ({ ...img, status: 'error' as const }));
+         onMessageUpdate(userMessage.id, { images: updatedImages });
+      }
 
-      // Check if it's a credit error
       if (isCreditError(error)) {
         onCreditError('Insufficient credits to process this request.');
       }
-
-      // Add error message
-      const errorMsg = createErrorMessage(`Failed to send message: ${error}`);
-      onMessageAdd(errorMsg);
-
+      onMessageAdd(createErrorMessage(`Failed to send message: ${error}`));
       return false;
     }
   };

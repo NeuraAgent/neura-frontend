@@ -9,7 +9,6 @@ interface UseFileSelectionProps {
 }
 
 export const useFileSelection = ({
-  isUploading,
   onFilesSelected,
 }: UseFileSelectionProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);

@@ -54,9 +54,11 @@ export interface LoginResponse {
   message: string;
   data?: {
     user: User;
-    token: string;
-    refresh_token?: string;
-    expires_in: number;
+    accessToken?: string;
+    refreshToken?: string;
+    token?: string; // Legacy support
+    refresh_token?: string; // Legacy support
+    expires_in?: number;
   };
 }
 

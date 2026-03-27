@@ -3,8 +3,8 @@
  * Displays a single chat message (user or assistant)
  */
 
-import { Check, Copy } from 'lucide-react';
-import React from 'react';
+import { Check, Copy, X } from 'lucide-react';
+import React, { useState } from 'react';
 import { CodeBlock } from 'react-code-blocks';
 import ReactMarkdown from 'react-markdown';
 import rehypeKatex from 'rehype-katex';
@@ -29,6 +29,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   copyLabel,
   copiedLabel,
 }) => {
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const isUser = message.role === 'user';
 
   return (
@@ -46,10 +47,41 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
             className={isUser ? 'max-w-[70%]' : 'flex-1 min-w-0 max-w-[85%]'}
           >
             {isUser ? (
-              <div className="bg-[#2D2D2D] text-white px-5 py-3.5 rounded-2xl rounded-tr-sm shadow-sm">
-                <p className="whitespace-pre-wrap text-[15px] leading-relaxed m-0">
-                  {message.content}
-                </p>
+              <div className="bg-[#2D2D2D] text-white px-5 py-3.5 rounded-2xl rounded-tr-sm shadow-sm inline-block">
+                <div className="flex flex-col gap-3">
+                  {message.content ? (
+                    <p className="whitespace-pre-wrap text-[15px] font-medium leading-relaxed m-0">
+                      {message.content}
+                    </p>
+                  ) : message.images && message.images.length > 0 ? (
+                    <p className="whitespace-pre-wrap text-[15px] italic text-gray-300 leading-relaxed m-0">
+                      Uploaded image{message.images.length > 1 ? 's' : ''}
+                    </p>
+                  ) : null}
+
+                  {message.images && message.images.length > 0 && (
+                    <div className="flex flex-row flex-wrap gap-2 mt-2">
+                      {message.images.map((img, idx) => (
+                        <div 
+                          key={idx} 
+                          className="relative rounded-lg overflow-hidden border border-[#404040] w-20 h-20 sm:w-24 sm:h-24 cursor-pointer hover:opacity-90 transition-opacity flex-shrink-0"
+                          onClick={() => setSelectedImage(img.url)}
+                        >
+                          <img 
+                            src={img.url} 
+                            alt={`Uploaded attachment ${idx + 1}`} 
+                            className="w-full h-full object-cover"
+                          />
+                          {(img.status === 'uploading' || img.status === 'processing') && (
+                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center backdrop-blur-[2px]">
+                              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
               <div className="bg-white rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm border border-gray-100 text-gray-800">
@@ -111,6 +143,26 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
           </div>
         </div>
       </div>
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div className="relative max-w-5xl w-full h-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+            <button 
+              className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/80 transition-colors z-10"
+              onClick={() => setSelectedImage(null)}
+            >
+               <X className="w-6 h-6" />
+            </button>
+            <img 
+              src={selectedImage} 
+              alt="Full size view" 
+              className="max-w-full max-h-full object-contain rounded-md"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -17,8 +17,9 @@ import { useLocale } from '@/contexts/LocaleContext';
 import { useLogout } from '@/hooks/useLogout';
 import { useIntroTourStore } from '@/stores/introTourStore';
 import { useUserStore } from '@/stores/userStore';
+import { ocrService } from '@/services/ocrService';
 
-import { ChatInput } from './dashboard/components/ChatInput';
+import { ChatInputWithImages } from './dashboard/components/ChatInputWithImages';
 import { ChatMessage } from './dashboard/components/ChatMessage';
 import { CreditWarning } from './dashboard/components/CreditWarning';
 import { DashboardSidebar } from './dashboard/components/DashboardSidebar';
@@ -33,6 +34,19 @@ import { useSidebar } from './dashboard/hooks/useSidebar';
 import { useSocket } from './dashboard/hooks/useSocket';
 import { Message } from './dashboard/types';
 import { resetTextareaHeight } from './dashboard/utils/textareaUtils';
+
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const result = reader.result as string;
+      const base64Data = result.split(',')[1];
+      resolve(base64Data);
+    };
+    reader.onerror = error => reject(error);
+  });
+};
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
@@ -53,6 +67,8 @@ const Dashboard: React.FC = () => {
   const [sources, setSources] = useState<any[]>([]);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [droppedFiles, setDroppedFiles] = useState<File[]>([]);
 
   // Refs
   const sessionIdRef = useRef(`frontend_${uuidv4()}`);
@@ -83,6 +99,9 @@ const Dashboard: React.FC = () => {
 
   const { sendMessage, isSendingRef } = useMessageSender({
     onMessageAdd: message => setMessages(prev => [...prev, message]),
+    onMessageUpdate: (id, updates) => setMessages(prev => 
+      prev.map(msg => msg.id === id ? { ...msg, ...updates } : msg)
+    ),
     onLoadingChange: setIsLoading,
     onCreditError: error => {
       setInsufficientCredits(true);
@@ -122,9 +141,8 @@ const Dashboard: React.FC = () => {
     };
   }, []);
 
-  // Handlers
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim() || isLoading || !user?.id) {
+  const handleSendMessage = async (message: string, images?: File[]) => {
+    if ((!message.trim() && !images?.length) || isLoading || !user?.id) {
       return;
     }
 
@@ -132,16 +150,61 @@ const Dashboard: React.FC = () => {
     setInsufficientCredits(false);
     setCreditError(null);
 
-    // Store message content
-    const messageContent = inputMessage.trim();
+    // Prepare optimistic display message and images
+    const displayContent = message.trim();
+    const initialImages = images?.map(file => ({
+      url: URL.createObjectURL(file), // create local preview link
+      status: 'processing' as const,
+    }));
 
-    // Clear input immediately
+    // Clear input immediately for prompt UI response
     setInputMessage('');
     resetTextareaHeight(textareaRef.current);
 
-    // Send message
+    // The backend processing payload handles the OCR flow without blocking the UI rendering
+    const getBackendContent = async () => {
+      let finalMessage = message.trim();
+
+      if (images && images.length > 0) {
+        try {
+          const extractedTexts: string[] = [];
+
+          for (const file of images) {
+            const base64 = await fileToBase64(file);
+            console.log(`[OCR Request] Starting OCR for network tab check - Image:`, file.name);
+            const ocrResponse = await ocrService.extractTextFromImage(base64);
+            console.log('[OCR Response Complete]:', ocrResponse);
+
+            if (ocrResponse.success && ocrResponse.extracted_text) {
+              extractedTexts.push(ocrResponse.extracted_text);
+            } else {
+              console.error(`[OCR Error for image ${file.name}]:`, ocrResponse.error);
+            }
+          }
+
+          if (extractedTexts.length > 0) {
+            const combinedOcrText = extractedTexts.join('\n\n---\n\n');
+            const instructions = `\n\nInstructions:\n- Use OCR content as context\n- Do not mention "OCR" or "extracted text"\n- Answer naturally as if you understood the image`;
+
+            if (message.trim()) {
+              finalMessage = `${message.trim()}\n\n[Extracted Text from Images (DO NOT SHOW TO USER)]:\n${combinedOcrText}${instructions}`;
+            } else {
+              finalMessage = `[Extracted Text from Images (DO NOT SHOW TO USER)]:\n${combinedOcrText}${instructions}`;
+            }
+          }
+        } catch (error) {
+          console.error('[OCR System Error]:', error);
+        }
+      }
+      return finalMessage;
+    };
+
+    // Send message to the channel (this instantly adds the UI message, THEN runs getBackendContent)
     await sendMessage({
-      content: messageContent,
+      content: message, // Used as baseline if getBackendContent isn't evaluated
+      displayContent,
+      images: initialImages,
+      getBackendContent,
       userId: user.id,
       sessionId: sessionIdRef.current,
       fileIds: getFileIds(),
@@ -166,8 +229,53 @@ const Dashboard: React.FC = () => {
     setCreditError(null);
   };
 
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    if (e.dataTransfer.types.includes('Files')) {
+      setIsDragging(true);
+    }
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    // Using relatedTarget to prevent flickering when hovering over children
+    if (!e.relatedTarget) {
+      setIsDragging(false);
+    }
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const files = Array.from(e.dataTransfer.files);
+      setDroppedFiles(files);
+    }
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div 
+      className="min-h-screen bg-gray-50 flex relative"
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      {/* Drag & Drop Overlay */}
+      {isDragging && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-blue-500/10 backdrop-blur-sm border-2 border-dashed border-blue-500 rounded-lg m-4 pointer-events-none transition-all">
+          <div className="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-800">Drop images here</h3>
+            <p className="text-sm text-gray-500 mt-2">Add images to your message automatically</p>
+          </div>
+        </div>
+      )}
+
       <IntroTour />
 
       <MobileOverlay isOpen={isSidebarOpen} onClose={toggleSidebar} />
@@ -248,7 +356,7 @@ const Dashboard: React.FC = () => {
                 />
               )}
 
-              <ChatInput
+              <ChatInputWithImages
                 ref={textareaRef}
                 value={inputMessage}
                 isLoading={isLoading}
@@ -258,6 +366,8 @@ const Dashboard: React.FC = () => {
                 onChange={setInputMessage}
                 onSend={handleSendMessage}
                 onModelChange={setSelectedModel}
+                droppedFiles={droppedFiles}
+                onDroppedFilesHandled={() => setDroppedFiles([])}
               />
             </div>
           </div>

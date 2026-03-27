@@ -8,8 +8,9 @@ import type {
   SignUpResponse,
   User,
 } from '@/types';
-import { createApiClient } from '@/utils/apiClient';
+import { createApiClient, DEV_TOKEN_STORAGE } from '@/utils/apiClient';
 import { handleNetworkError, logError } from '@/utils/errorHandler';
+import { env } from '@/utils/env';
 
 const api = createApiClient(BASE_URLS.API_GATEWAY);
 
@@ -23,6 +24,30 @@ class AuthService {
       );
 
       const { data } = response;
+
+      // In DEV mode, store tokens in localStorage for Authorization header
+      if (env.NODE_ENV === 'development' && data.success && data.data) {
+        console.log(
+          '🔓 [DEV] Login successful, storing tokens in localStorage'
+        );
+        console.log('🔓 [DEV] Response data:', {
+          hasAccessToken: !!data.data.accessToken,
+          hasToken: !!data.data.token,
+          hasRefreshToken: !!data.data.refreshToken,
+          hasRefresh_token: !!data.data.refresh_token,
+        });
+        const accessToken = data.data.accessToken || data.data.token;
+        const refreshToken = data.data.refreshToken || data.data.refresh_token;
+        if (accessToken && refreshToken) {
+          console.log('🔓 [DEV] Storing tokens:', {
+            accessTokenLength: accessToken.length,
+            refreshTokenLength: refreshToken.length,
+          });
+          DEV_TOKEN_STORAGE.setTokens(accessToken, refreshToken);
+        } else {
+          console.error('❌ [DEV] Tokens not found in response:', data.data);
+        }
+      }
 
       // User data will be set by the component using userStore
       // Tokens are in HTTP-only cookies - frontend never touches them
@@ -46,8 +71,13 @@ class AuthService {
         {},
         { withCredentials: true }
       );
+
+      // Clear dev tokens
+      DEV_TOKEN_STORAGE.clearTokens();
     } catch (error) {
       logError('Logout', error);
+      // Clear dev tokens even on error
+      DEV_TOKEN_STORAGE.clearTokens();
     }
     // User data will be cleared by the component using userStore
     // Cookies are cleared by the backend
@@ -124,6 +154,16 @@ class AuthService {
       const { data } = response;
 
       if (data.success && data.data) {
+        // In DEV mode, update tokens in localStorage
+        if (env.NODE_ENV === 'development') {
+          const accessToken = data.data.accessToken || data.data.token;
+          const refreshToken =
+            data.data.refreshToken || data.data.refresh_token;
+          if (accessToken && refreshToken) {
+            DEV_TOKEN_STORAGE.setTokens(accessToken, refreshToken);
+          }
+        }
+
         // User data will be updated by the component using userStore
         return true;
       }
@@ -131,6 +171,8 @@ class AuthService {
       return false;
     } catch (error) {
       logError('Token Refresh', error);
+      // Clear dev tokens on refresh failure
+      DEV_TOKEN_STORAGE.clearTokens();
       return false;
     }
   }

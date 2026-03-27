@@ -21,12 +21,12 @@ const MessageInput: React.FC<MessageInputProps> = ({
   };
 
   return (
-    <div className="p-4 mx-4 mb-6 rounded-lg shadow-sm bg-gray-50 dark:bg-gray-800">
+    <div className="p-4 mx-4 mb-6 rounded-lg shadow-sm bg-gray-50">
       <form onSubmit={handleSubmit} className="flex gap-3">
         <input
           type="text"
           placeholder="Ask me anything! I can solve math, write poems, explain concepts..."
-          className="flex-1 px-5 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 outline-none text-base transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900"
+          className="flex-1 px-5 py-3 border border-gray-300 rounded-lg bg-white text-gray-800 placeholder-gray-500 outline-none text-base transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           value={messageInput}
           onChange={e => setMessageInput(e.target.value)}
           disabled={disabled}

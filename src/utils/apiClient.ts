@@ -19,6 +19,49 @@ import { env } from './env';
 export const registerLogoutCallback =
   LogoutManager.registerCallback.bind(LogoutManager);
 
+// Token storage for development mode
+const DEV_TOKEN_STORAGE = {
+  getAccessToken: (): string | null => {
+    if (env.NODE_ENV === 'development') {
+      return localStorage.getItem('dev_access_token');
+    }
+    return null;
+  },
+  getRefreshToken: (): string | null => {
+    if (env.NODE_ENV === 'development') {
+      return localStorage.getItem('dev_refresh_token');
+    }
+    return null;
+  },
+  setTokens: (accessToken: string, refreshToken: string): void => {
+    if (env.NODE_ENV === 'development') {
+      const timestamp = new Date().toISOString();
+      localStorage.setItem('dev_access_token', accessToken);
+      localStorage.setItem('dev_refresh_token', refreshToken);
+      localStorage.setItem('dev_token_timestamp', timestamp);
+      console.log('🔓 [DEV] Tokens stored in localStorage at', timestamp);
+      console.log('🔓 [DEV] Token lengths:', {
+        access: accessToken.length,
+        refresh: refreshToken.length,
+      });
+    }
+  },
+  clearTokens: (): void => {
+    if (env.NODE_ENV === 'development') {
+      const hadTokens = !!localStorage.getItem('dev_access_token');
+      localStorage.removeItem('dev_access_token');
+      localStorage.removeItem('dev_refresh_token');
+      localStorage.removeItem('dev_token_timestamp');
+      if (hadTokens) {
+        console.log('🔓 [DEV] Tokens cleared from localStorage');
+      }
+    }
+  },
+};
+
+// Export token storage for use in auth service
+export { DEV_TOKEN_STORAGE };
+
 /**
  * Handle error responses
  */
@@ -34,6 +77,8 @@ function handleErrorResponse(error: AxiosError | unknown): Promise<never> {
 
     // Trigger logout for 401 auth errors
     if (errorInfo.status === 401) {
+      // Clear dev tokens on 401
+      DEV_TOKEN_STORAGE.clearTokens();
       LogoutManager.logout('Token expired, invalid, or missing');
     }
   }
@@ -83,6 +128,27 @@ export function createApiClient(baseURL?: string): AxiosInstance {
       } catch (error) {
         if (env.NODE_ENV === 'development') {
           console.error('❌ Failed to get frontend token:', error);
+        }
+      }
+
+      // In DEV mode, add Authorization header with access token
+      if (env.NODE_ENV === 'development') {
+        const accessToken = DEV_TOKEN_STORAGE.getAccessToken();
+        if (accessToken) {
+          config.headers['Authorization'] = `Bearer ${accessToken}`;
+          console.log('🔓 [DEV] Added Authorization header to request:', {
+            url: config.url,
+            method: config.method,
+            tokenLength: accessToken.length,
+          });
+        } else {
+          console.warn(
+            '⚠️ [DEV] No access token found in localStorage for request:',
+            {
+              url: config.url,
+              method: config.method,
+            }
+          );
         }
       }
 

@@ -3,19 +3,23 @@
  * Helper functions for message operations
  */
 
-import { Message } from '../types';
+import { v4 as uuidv4 } from 'uuid';
+import { Message, MessageImage } from '../types';
 
 export const createMessage = (
   role: Message['role'],
-  content: string
+  content: string,
+  images?: MessageImage[]
 ): Message => ({
+  id: uuidv4(),
   role,
   content,
   timestamp: new Date().toLocaleTimeString(),
+  images,
 });
 
-export const createUserMessage = (content: string): Message =>
-  createMessage('user', content);
+export const createUserMessage = (content: string, images?: MessageImage[]): Message =>
+  createMessage('user', content, images);
 
 export const createAssistantMessage = (content: string): Message =>
   createMessage('assistant', content);
