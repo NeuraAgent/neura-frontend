@@ -22,12 +22,17 @@ export const adjustTextareaHeight = (
   textarea.style.height = 'auto';
 
   // Calculate new height based on content
-  const newHeight = Math.min(textarea.scrollHeight, TEXTAREA_CONFIG.MAX_HEIGHT);
+  const scrollHeight = textarea.scrollHeight;
+  const newHeight = Math.min(scrollHeight, TEXTAREA_CONFIG.MAX_HEIGHT);
+
   textarea.style.height = `${newHeight}px`;
 
-  // Show scrollbar only when max height is reached
-  if (textarea.scrollHeight > TEXTAREA_CONFIG.MAX_HEIGHT) {
+  // Show scrollbar only when max height is reached or exceeded
+  if (scrollHeight > TEXTAREA_CONFIG.MAX_HEIGHT) {
     textarea.style.overflowY = 'auto';
+    // Ensure the scrollbar is visible immediately
+    // @ts-ignore
+    textarea.style.scrollbarWidth = 'thin';
   } else {
     textarea.style.overflowY = 'hidden';
   }

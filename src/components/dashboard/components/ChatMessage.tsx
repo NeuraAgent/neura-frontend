@@ -7,6 +7,7 @@ import { Check, Copy, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { CodeBlock } from 'react-code-blocks';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
 
@@ -87,7 +88,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
               <div className="bg-white rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm border border-gray-100 text-gray-800">
                 <div className="prose prose-sm max-w-none break-words">
                   <ReactMarkdown
-                    remarkPlugins={[remarkMath]}
+                    remarkPlugins={[remarkMath, remarkGfm]}
                     rehypePlugins={[rehypeKatex]}
                     components={{
                       code({

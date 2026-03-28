@@ -14,7 +14,7 @@ export const MODEL_OPTIONS = [
 
 export const TEXTAREA_CONFIG = {
   MIN_HEIGHT: 24,
-  MAX_HEIGHT: 200,
+  MAX_HEIGHT: 360,
   LINE_HEIGHT: 24,
 } as const;
 

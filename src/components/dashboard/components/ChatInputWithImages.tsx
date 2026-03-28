@@ -1,5 +1,6 @@
-import { Send, Image as ImageIcon, X, Plus, Mic, MoreHorizontal, ChevronRight } from 'lucide-react';
+import { Send, Image as ImageIcon, X, Plus, MoreHorizontal, ChevronRight } from 'lucide-react';
 import React, { useState, useRef, forwardRef, useEffect } from 'react';
+import { adjustTextareaHeight } from '../utils/textareaUtils';
 
 import { MODEL_OPTIONS } from '../constants';
 
@@ -60,6 +61,13 @@ export const ChatInputWithImages = forwardRef<
         imagePreviews.forEach(url => URL.revokeObjectURL(url));
       };
     }, []);
+
+    // Adjust height on value change
+    useEffect(() => {
+      if (ref && 'current' in ref && ref.current) {
+        adjustTextareaHeight(ref.current);
+      }
+    }, [value, ref]);
 
     const handleImagesChange = (files: File[]) => {
       // Cleanup old previews
@@ -152,14 +160,14 @@ export const ChatInputWithImages = forwardRef<
         {/* Input Area */}
         <div
           className={`
-            bg-[#f4f4f4] rounded-[24px] border border-transparent transition-all
+            bg-[#f4f4f4] rounded-[24px] border border-transparent transition-all relative
             ${isTourActive ? 'ring-4 ring-blue-500 ring-opacity-50' : ''}
             ${isLoading ? 'opacity-70' : ''}
           `}
         >
-          <div className="flex items-end gap-2 p-2 relative">
-            {/* Plus Button with Menu */}
-            <div className="relative flex-shrink-0" ref={plusMenuRef}>
+          <div className="flex items-end p-2 relative min-h-[60px]">
+            {/* Plus Button with Menu (Absolute Positioned Left) */}
+            <div className="absolute left-2 bottom-[10px] z-20 flex-shrink-0" ref={plusMenuRef}>
               {/* Hidden File Input outside conditional render */}
               <input
                 type="file"
@@ -209,8 +217,11 @@ export const ChatInputWithImages = forwardRef<
                 </div>
               )}
             </div>
+            
+            {/* Spacer for Plus Button Flow */}
+            <div className="w-11 h-10 flex-shrink-0" aria-hidden="true" />
 
-            {/* Textarea */}
+            {/* Textarea (Flex-1 for scrollbar at far right) */}
             <textarea
               ref={ref}
               value={value}
@@ -219,18 +230,14 @@ export const ChatInputWithImages = forwardRef<
               placeholder={placeholder}
               disabled={isLoading}
               rows={1}
-              className="flex-1 resize-none bg-transparent outline-none text-gray-800 placeholder-gray-500 disabled:opacity-50 max-h-32 overflow-y-auto self-center pb-1 pt-1.5"
+              className="flex-1 resize-none bg-transparent outline-none text-gray-800 placeholder-gray-500 disabled:opacity-50 py-[10px] px-2 pr-[11.5rem]"
               style={{
-                minHeight: '28px',
-                maxHeight: '128px',
+                minHeight: '44px',
               }}
             />
 
-            {/* Right Icons: Mic, Model Selector, Send Button */}
-            <div className="flex items-center gap-1">
-              <button className="flex-shrink-0 p-2 w-10 h-10 flex items-center justify-center rounded-full text-gray-500 hover:text-gray-800 hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                <Mic className="w-5 h-5" />
-              </button>
+            {/* Right Icons: Model Selector, Send Button (Absolute Positioned Right) */}
+            <div className="absolute right-2 bottom-[10px] z-20 flex items-center gap-1">
 
               <select
                 value={selectedModel}
