@@ -80,6 +80,7 @@ export interface ABACCondition {
 export interface AccessDecision {
   allowed: boolean;
   reason: string;
+  reasons?: string[];
   matchedRule?: ABACRule;
   evaluatedAt: string;
 }

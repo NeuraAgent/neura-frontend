@@ -18,7 +18,8 @@ import Layout from '@/components/Layout';
 import { useAuth } from '@/contexts/AuthContext';
 import { ABACProvider } from '@/features/abac';
 import { EnterpriseLayout } from '@/features/enterprise';
-import { EnterpriseDashboard, DocumentsPage, AccessControlPage } from '@/pages/enterprise';
+import { DocumentSelectionProvider } from '@/features/documents/DocumentSelectionContext';
+import { EnterpriseDashboard, DocumentsPage, AccessControlPage, ChatPage } from '@/pages/enterprise';
 import Settings from '@/pages/Settings';
 
 const AppRoutes: React.FC = () => {
@@ -173,10 +174,9 @@ const AppRoutes: React.FC = () => {
           element={
             <ABACProvider>
               <EnterpriseLayout>
-                <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-2">AI Chat</h2>
-                  <p className="text-sm text-gray-500">Enterprise AI chat with ABAC-aware document context coming soon</p>
-                </div>
+                <DocumentSelectionProvider>
+                  <ChatPage />
+                </DocumentSelectionProvider>
               </EnterpriseLayout>
             </ABACProvider>
           }

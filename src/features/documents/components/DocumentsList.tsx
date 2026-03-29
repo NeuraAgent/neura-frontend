@@ -2,6 +2,7 @@ import { FileText, Filter, Grid, List, Search, X } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 
 import { useABAC } from '@/features/abac';
+import { useDocumentSelection } from '../DocumentSelectionContext';
 import {
   DEPARTMENT_LABELS,
   SENSITIVITY_CONFIG,
@@ -14,10 +15,12 @@ import { DocumentCard } from './DocumentCard';
 
 interface DocumentsListProps {
   onDocumentView?: (doc: EnterpriseDocument) => void;
+  showCheckboxes?: boolean;
 }
 
-export function DocumentsList({ onDocumentView }: DocumentsListProps) {
+export function DocumentsList({ onDocumentView, showCheckboxes = false }: DocumentsListProps) {
   const { allDocuments, checkAccess } = useABAC();
+  const { selectionCount } = useDocumentSelection();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState<Department | 'all'>('all');
   const [selectedSensitivity, setSelectedSensitivity] = useState<Sensitivity | 'all'>('all');
@@ -186,6 +189,7 @@ export function DocumentsList({ onDocumentView }: DocumentsListProps) {
               key={doc.id}
               document={doc}
               onView={onDocumentView}
+              showCheckbox={showCheckboxes}
             />
           ))}
         </div>

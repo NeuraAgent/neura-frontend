@@ -2,6 +2,7 @@ import { FileText, Download, Lock, Eye, Calendar, User, Tag, Globe } from 'lucid
 import React from 'react';
 
 import { useABAC } from '@/features/abac';
+import { useDocumentSelection } from '../DocumentSelectionContext';
 import {
   SENSITIVITY_CONFIG,
   DEPARTMENT_LABELS,
@@ -13,11 +14,14 @@ interface DocumentCardProps {
   document: EnterpriseDocument;
   onView?: (doc: EnterpriseDocument) => void;
   onDownload?: (doc: EnterpriseDocument) => void;
+  showCheckbox?: boolean;
 }
 
-export function DocumentCard({ document, onView, onDownload }: DocumentCardProps) {
+export function DocumentCard({ document, onView, onDownload, showCheckbox = false }: DocumentCardProps) {
   const { checkAccess, logAccess } = useABAC();
+  const { isSelected, toggleDocument } = useDocumentSelection();
   const accessDecision = checkAccess(document);
+  const isDocSelected = isSelected(document.id);
 
   const sensitivityConfig = SENSITIVITY_CONFIG[document.attributes.sensitivity];
 
@@ -63,9 +67,18 @@ export function DocumentCard({ document, onView, onDownload }: DocumentCardProps
     >
       {/* Header */}
       <div className="p-4 pb-3">
-        <div className="flex items-start justify-between mb-3">
+        <div className="flex items-start justify-between mb-3 gap-2">
+          {showCheckbox && (
+            <input
+              type="checkbox"
+              checked={isDocSelected}
+              onChange={() => toggleDocument(document.id)}
+              disabled={!accessDecision.allowed}
+              className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            />
+          )}
           <div
-            className={`p-2 rounded-xl ${
+            className={`p-2 rounded-xl flex-shrink-0 ${
               accessDecision.allowed ? 'bg-gray-100' : 'bg-gray-50'
             }`}
           >

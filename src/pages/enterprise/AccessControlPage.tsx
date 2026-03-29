@@ -1,17 +1,23 @@
-import { Shield, Clock, FileText, User, CheckCircle, XCircle } from 'lucide-react';
-import React from 'react';
+import { Shield, Clock, FileText, User, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import React, { useState } from 'react';
 
 import { useABAC } from '@/features/abac';
+import { AccessTransparency, AccessLogs } from '@/features/abac/components';
 import { DEPARTMENT_LABELS, SENSITIVITY_CONFIG } from '@/features/abac/types';
 
 export function AccessControlPage() {
   const { currentUser, accessLogs, allDocuments, checkAccess } = useABAC();
+  const [expandedDocId, setExpandedDocId] = useState<string | null>(null);
 
   // Get access decisions for all documents
   const accessDecisions = allDocuments.map(doc => ({
     document: doc,
     decision: checkAccess(doc),
   }));
+
+  // Separate allowed and denied
+  const allowedDocs = accessDecisions.filter(a => a.decision.allowed);
+  const deniedDocs = accessDecisions.filter(a => !a.decision.allowed);
 
   const formatTime = (timestamp: string) => {
     return new Date(timestamp).toLocaleString('en-US', {
@@ -74,7 +80,26 @@ export function AccessControlPage() {
         )}
       </div>
 
-      {/* Access Decisions */}
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-emerald-50 rounded-2xl border border-emerald-200 p-4">
+          <p className="text-xs text-emerald-600 uppercase font-medium mb-1">Accessible</p>
+          <p className="text-2xl font-bold text-emerald-700">{allowedDocs.length}</p>
+          <p className="text-xs text-emerald-600 mt-1">documents you can access</p>
+        </div>
+        <div className="bg-red-50 rounded-2xl border border-red-200 p-4">
+          <p className="text-xs text-red-600 uppercase font-medium mb-1">Restricted</p>
+          <p className="text-2xl font-bold text-red-700">{deniedDocs.length}</p>
+          <p className="text-xs text-red-600 mt-1">documents you cannot access</p>
+        </div>
+        <div className="bg-blue-50 rounded-2xl border border-blue-200 p-4">
+          <p className="text-xs text-blue-600 uppercase font-medium mb-1">Total Documents</p>
+          <p className="text-2xl font-bold text-blue-700">{allDocuments.length}</p>
+          <p className="text-xs text-blue-600 mt-1">in the system</p>
+        </div>
+      </div>
+
+      {/* Access Decisions with Transparency */}
       <div className="bg-white rounded-2xl border border-gray-100">
         <div className="p-5 border-b border-gray-100">
           <h2 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
@@ -82,97 +107,122 @@ export function AccessControlPage() {
             Document Access Decisions
           </h2>
           <p className="text-xs text-gray-500 mt-1">
-            Real-time ABAC evaluation for all documents
+            Real-time ABAC evaluation with transparent reasoning for each decision
           </p>
         </div>
-        <div className="divide-y divide-gray-50 max-h-96 overflow-y-auto">
-          {accessDecisions.map(({ document, decision }) => {
-            const sensitivityConfig = SENSITIVITY_CONFIG[document.attributes.sensitivity];
-            return (
-              <div key={document.id} className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {decision.allowed ? (
-                    <div className="p-2 bg-emerald-50 rounded-lg">
-                      <CheckCircle className="w-4 h-4 text-emerald-600" />
-                    </div>
-                  ) : (
-                    <div className="p-2 bg-red-50 rounded-lg">
-                      <XCircle className="w-4 h-4 text-red-600" />
-                    </div>
-                  )}
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{document.title}</p>
-                    <p className="text-xs text-gray-500 mt-0.5 max-w-md truncate">
-                      {decision.reason}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`px-2 py-0.5 text-[10px] font-medium rounded ${sensitivityConfig.bgColor} ${sensitivityConfig.color}`}
-                  >
-                    {sensitivityConfig.label}
-                  </span>
-                  <span className="text-xs text-gray-400">
-                    {DEPARTMENT_LABELS[document.attributes.department]}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
 
-      {/* Access Logs */}
-      <div className="bg-white rounded-2xl border border-gray-100">
-        <div className="p-5 border-b border-gray-100">
-          <h2 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-            <Clock className="w-4 h-4" />
-            Recent Access Logs
-          </h2>
-          <p className="text-xs text-gray-500 mt-1">
-            Audit trail of document access attempts
-          </p>
-        </div>
-        {accessLogs.length > 0 ? (
-          <div className="divide-y divide-gray-50 max-h-64 overflow-y-auto">
-            {accessLogs.map(log => {
-              const document = allDocuments.find(d => d.id === log.documentId);
-              return (
-                <div key={log.id} className="p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    {log.decision.allowed ? (
-                      <div className="p-2 bg-emerald-50 rounded-lg">
-                        <CheckCircle className="w-4 h-4 text-emerald-600" />
+        {/* Allowed Documents */}
+        {allowedDocs.length > 0 && (
+          <div className="border-b border-gray-50">
+            <div className="px-5 py-3 bg-emerald-50">
+              <h3 className="text-xs font-semibold text-emerald-900 flex items-center gap-2">
+                <CheckCircle className="w-3.5 h-3.5" />
+                Accessible ({allowedDocs.length})
+              </h3>
+            </div>
+            <div className="divide-y divide-gray-50">
+              {allowedDocs.map(({ document, decision }) => {
+                const sensitivityConfig = SENSITIVITY_CONFIG[document.attributes.sensitivity];
+                const isExpanded = expandedDocId === document.id;
+
+                return (
+                  <div key={document.id} className="p-4">
+                    <div
+                      onClick={() => setExpandedDocId(isExpanded ? null : document.id)}
+                      className="cursor-pointer flex items-center justify-between"
+                    >
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="p-2 bg-emerald-50 rounded-lg">
+                          <CheckCircle className="w-4 h-4 text-emerald-600" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">{document.title}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">{decision.reason}</p>
+                        </div>
                       </div>
-                    ) : (
-                      <div className="p-2 bg-red-50 rounded-lg">
-                        <XCircle className="w-4 h-4 text-red-600" />
+                      <div className="flex items-center gap-3">
+                        <span
+                          className={`px-2 py-0.5 text-[10px] font-medium rounded ${sensitivityConfig.bgColor} ${sensitivityConfig.color}`}
+                        >
+                          {sensitivityConfig.label}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          {isExpanded ? '▼' : '▶'}
+                        </span>
+                      </div>
+                    </div>
+                    {isExpanded && (
+                      <div className="mt-3 ml-12 pt-3 border-t border-gray-100">
+                        <AccessTransparency decision={decision} documentTitle={document.title} showFullDetails={true} />
                       </div>
                     )}
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">
-                        {document?.title || log.documentId}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        Action: <span className="capitalize">{log.action}</span>
-                      </p>
-                    </div>
                   </div>
-                  <span className="text-xs text-gray-400">{formatTime(log.timestamp)}</span>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="p-8 text-center">
-            <Clock className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-            <p className="text-sm text-gray-500">No access logs yet</p>
-            <p className="text-xs text-gray-400 mt-1">
-              Access logs will appear here when you view or download documents
-            </p>
+                );
+              })}
+            </div>
           </div>
         )}
+
+        {/* Restricted Documents */}
+        {deniedDocs.length > 0 && (
+          <div>
+            <div className="px-5 py-3 bg-red-50">
+              <h3 className="text-xs font-semibold text-red-900 flex items-center gap-2">
+                <XCircle className="w-3.5 h-3.5" />
+                Restricted ({deniedDocs.length})
+              </h3>
+            </div>
+            <div className="divide-y divide-gray-50 max-h-64 overflow-y-auto">
+              {deniedDocs.map(({ document, decision }) => {
+                const sensitivityConfig = SENSITIVITY_CONFIG[document.attributes.sensitivity];
+                const isExpanded = expandedDocId === document.id;
+
+                return (
+                  <div key={document.id} className="p-4">
+                    <div
+                      onClick={() => setExpandedDocId(isExpanded ? null : document.id)}
+                      className="cursor-pointer flex items-center justify-between"
+                    >
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="p-2 bg-red-50 rounded-lg">
+                          <AlertCircle className="w-4 h-4 text-red-600" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">{document.title}</p>
+                          <p className="text-xs text-red-600 mt-0.5">{decision.reason}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span
+                          className={`px-2 py-0.5 text-[10px] font-medium rounded ${sensitivityConfig.bgColor} ${sensitivityConfig.color}`}
+                        >
+                          {sensitivityConfig.label}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          {isExpanded ? '▼' : '▶'}
+                        </span>
+                      </div>
+                    </div>
+                    {isExpanded && (
+                      <div className="mt-3 ml-12 pt-3 border-t border-gray-100">
+                        <AccessTransparency decision={decision} documentTitle={document.title} showFullDetails={true} />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Access Audit Logs */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-5">
+        <h2 className="text-sm font-semibold text-gray-900 flex items-center gap-2 mb-4">
+          <Clock className="w-4 h-4" />
+          Access Audit Logs
+        </h2>
+        <AccessLogs />
       </div>
     </div>
   );

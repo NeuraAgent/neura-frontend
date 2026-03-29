@@ -149,12 +149,15 @@ export function evaluateAccess(
   action: 'view' | 'download' | 'edit' | 'delete' | 'share' = 'view'
 ): AccessDecision {
   const timestamp = new Date().toISOString();
+  const reasons: string[] = [];
 
   // Rule 1: Check clearance level (fundamental requirement)
   if (!checkClearance(user, document)) {
+    reasons.push(`Insufficient clearance level. User has '${user.attributes.clearance}' clearance, but document requires '${document.attributes.sensitivity}' or higher.`);
     return {
       allowed: false,
-      reason: `Insufficient clearance level. User has '${user.attributes.clearance}' clearance, but document requires '${document.attributes.sensitivity}' or higher.`,
+      reason: reasons.join(' '),
+      reasons,
       matchedRule: defaultABACRules[0],
       evaluatedAt: timestamp,
     };
