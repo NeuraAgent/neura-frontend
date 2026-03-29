@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo, useEffect, type ReactNode } from 'react';
 
+import { useEnterpriseAuth } from '@/features/auth';
 import { mockDocuments } from '@/mocks/documents';
 import { mockUsers, defaultMockUser } from '@/mocks/users';
 
@@ -35,8 +36,21 @@ interface ABACContextValue {
 const ABACContext = createContext<ABACContextValue | null>(null);
 
 export function ABACProvider({ children }: { children: ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<EnterpriseUser>(defaultMockUser);
+  // Get authenticated user from Enterprise Auth
+  const { user: authenticatedUser, isAuthenticated } = useEnterpriseAuth();
+  
+  // Use authenticated user if available, otherwise fall back to defaultMockUser for demo
+  const [currentUser, setCurrentUser] = useState<EnterpriseUser>(
+    authenticatedUser || defaultMockUser
+  );
   const [accessLogs, setAccessLogs] = useState<AccessLog[]>([]);
+
+  // Sync ABAC user with authenticated user when auth state changes
+  useEffect(() => {
+    if (isAuthenticated && authenticatedUser) {
+      setCurrentUser(authenticatedUser);
+    }
+  }, [isAuthenticated, authenticatedUser]);
 
   // All available documents
   const allDocuments = useMemo(() => mockDocuments, []);

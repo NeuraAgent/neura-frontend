@@ -16,7 +16,6 @@ import DocsPage from '@/components/landing/DocsPage';
 import LandingPage from '@/components/landing/LandingPage';
 import Layout from '@/components/Layout';
 import { useAuth } from '@/contexts/AuthContext';
-import EnterpriseRoutes from '@/features/enterprise-auth/EnterpriseRoutes';
 import { ABACProvider } from '@/features/abac';
 import { EnterpriseAuthProvider, EnterpriseProtectedRoute } from '@/features/auth';
 import { EnterpriseLayout } from '@/features/enterprise';
@@ -35,9 +34,6 @@ const AppRoutes: React.FC = () => {
 
         {/* Documentation Page - Public */}
         <Route path="/docs" element={<DocsPage />} />
-
-        {/* Enterprise Application Routes - Separate Auth System */}
-        <Route path="/enterprise/*" element={<EnterpriseRoutes />} />
 
         {/* Neura App Routes */}
         <Route
