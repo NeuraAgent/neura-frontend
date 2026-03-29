@@ -350,7 +350,7 @@ interface UserStore {
 **Login**:
 
 ```typescript
-POST / auth / login;
+POST /auth/login
 Request: {
   email: string;
   password: string;

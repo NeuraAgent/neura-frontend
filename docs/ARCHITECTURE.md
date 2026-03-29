@@ -12,7 +12,9 @@ This document describes the architecture of the neura-frontend application.
 **Styling**: Tailwind CSS  
 **State**: React Context + Zustand  
 **Routing**: React Router v7  
-**Port**: 3000 (dev), 80 (production)
+- **Port**: 3000 (dev), 80 (production)
+- **API Gateway**: 9999
+- **AI Core (WS)**: 8000
 
 ---
 
@@ -63,10 +65,46 @@ This document describes the architecture of the neura-frontend application.
 ┌─────────────────────────────────────────────────────────────┐
 │                  Backend Services                            │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐                 │
-│  │   API    │  │ AI Core  │  │ Payment  │                 │
-│  │ Gateway  │  │(WebSocket)│  │ Service  │                 │
+│  │API Gateway│  │ AI Core  │  │ Payment  │                 │
+│  │ (9999)    │  │ (8000)   │  │ Service  │                 │
 │  └──────────┘  └──────────┘  └──────────┘                 │
 └─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Directory Structure
+
+```
+neura-frontend/
+├── src/
+│   ├── components/              # Reusable UI components
+│   │   ├── auth/               # Authentication components
+│   │   ├── landing/            # Landing page sections
+│   │   ├── error/              # Error handling
+│   │   ├── ChatInterface.tsx   # Main chat UI
+│   │   └── ...
+│   ├── pages/                  # Page-level components
+│   ├── contexts/               # React contexts
+│   ├── services/               # API service layer
+│   ├── stores/                 # Zustand stores
+│   ├── hooks/                  # Custom hooks
+│   ├── types/                  # TypeScript types
+│   ├── utils/                  # Utility functions
+│   │   └── apiClient.ts        # Axios instance (BaseURL: :9999)
+│   ├── constants/              # Constants
+│   ├── styles/                 # Global styles
+│   ├── App.tsx                 # Root component
+│   └── main.tsx                # Entry point
+├── public/                     # Static assets
+├── docs/                       # Documentation
+├── .env                        # Environment variables
+├── vite.config.ts              # Vite configuration (Port: 3000)
+├── tailwind.config.js          # Tailwind configuration
+├── tsconfig.json               # TypeScript configuration
+└── package.json                # Dependencies
+```
+──────────────────────────────────┘
 ```
 
 ---
