@@ -16,6 +16,9 @@ import DocsPage from '@/components/landing/DocsPage';
 import LandingPage from '@/components/landing/LandingPage';
 import Layout from '@/components/Layout';
 import { useAuth } from '@/contexts/AuthContext';
+import { ABACProvider } from '@/features/abac';
+import { EnterpriseLayout } from '@/features/enterprise';
+import { EnterpriseDashboard, DocumentsPage, AccessControlPage } from '@/pages/enterprise';
 import Settings from '@/pages/Settings';
 
 const AppRoutes: React.FC = () => {
@@ -132,6 +135,103 @@ const AppRoutes: React.FC = () => {
         <Route
           path="/neura/auth/silent-callback"
           element={<SilentCallback />}
+        />
+
+        {/* Enterprise Routes - ABAC Knowledge System */}
+        <Route
+          path="/enterprise"
+          element={
+            <ABACProvider>
+              <EnterpriseLayout>
+                <EnterpriseDashboard />
+              </EnterpriseLayout>
+            </ABACProvider>
+          }
+        />
+        <Route
+          path="/enterprise/documents"
+          element={
+            <ABACProvider>
+              <EnterpriseLayout>
+                <DocumentsPage />
+              </EnterpriseLayout>
+            </ABACProvider>
+          }
+        />
+        <Route
+          path="/enterprise/access"
+          element={
+            <ABACProvider>
+              <EnterpriseLayout>
+                <AccessControlPage />
+              </EnterpriseLayout>
+            </ABACProvider>
+          }
+        />
+        <Route
+          path="/enterprise/chat"
+          element={
+            <ABACProvider>
+              <EnterpriseLayout>
+                <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-2">AI Chat</h2>
+                  <p className="text-sm text-gray-500">Enterprise AI chat with ABAC-aware document context coming soon</p>
+                </div>
+              </EnterpriseLayout>
+            </ABACProvider>
+          }
+        />
+        <Route
+          path="/enterprise/folders"
+          element={
+            <ABACProvider>
+              <EnterpriseLayout>
+                <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-2">Folders</h2>
+                  <p className="text-sm text-gray-500">Organize documents into folders with inherited permissions</p>
+                </div>
+              </EnterpriseLayout>
+            </ABACProvider>
+          }
+        />
+        <Route
+          path="/enterprise/users"
+          element={
+            <ABACProvider>
+              <EnterpriseLayout>
+                <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-2">User Management</h2>
+                  <p className="text-sm text-gray-500">Manage users and their ABAC attributes</p>
+                </div>
+              </EnterpriseLayout>
+            </ABACProvider>
+          }
+        />
+        <Route
+          path="/enterprise/analytics"
+          element={
+            <ABACProvider>
+              <EnterpriseLayout>
+                <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-2">Analytics</h2>
+                  <p className="text-sm text-gray-500">Document access analytics and insights</p>
+                </div>
+              </EnterpriseLayout>
+            </ABACProvider>
+          }
+        />
+        <Route
+          path="/enterprise/settings"
+          element={
+            <ABACProvider>
+              <EnterpriseLayout>
+                <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-2">Settings</h2>
+                  <p className="text-sm text-gray-500">Configure ABAC policies and enterprise settings</p>
+                </div>
+              </EnterpriseLayout>
+            </ABACProvider>
+          }
         />
 
         {/* Legacy route redirects */}
