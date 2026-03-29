@@ -17,9 +17,10 @@ import LandingPage from '@/components/landing/LandingPage';
 import Layout from '@/components/Layout';
 import { useAuth } from '@/contexts/AuthContext';
 import { ABACProvider } from '@/features/abac';
+import { EnterpriseAuthProvider, EnterpriseProtectedRoute } from '@/features/auth';
 import { EnterpriseLayout } from '@/features/enterprise';
 import { DocumentSelectionProvider } from '@/features/documents/DocumentSelectionContext';
-import { EnterpriseDashboard, DocumentsPage, AccessControlPage, ChatPage } from '@/pages/enterprise';
+import { EnterpriseDashboard, DocumentsPage, AccessControlPage, ChatPage, EnterpriseLoginPage } from '@/pages/enterprise';
 import Settings from '@/pages/Settings';
 
 const AppRoutes: React.FC = () => {
@@ -139,98 +140,141 @@ const AppRoutes: React.FC = () => {
         />
 
         {/* Enterprise Routes - ABAC Knowledge System */}
+        {/* Enterprise Login - Public */}
+        <Route
+          path="/enterprise/login"
+          element={
+            <EnterpriseAuthProvider>
+              <EnterpriseLoginPage />
+            </EnterpriseAuthProvider>
+          }
+        />
+
+        {/* Protected Enterprise Routes */}
         <Route
           path="/enterprise"
           element={
-            <ABACProvider>
-              <EnterpriseLayout>
-                <EnterpriseDashboard />
-              </EnterpriseLayout>
-            </ABACProvider>
+            <EnterpriseAuthProvider>
+              <EnterpriseProtectedRoute>
+                <ABACProvider>
+                  <EnterpriseLayout>
+                    <EnterpriseDashboard />
+                  </EnterpriseLayout>
+                </ABACProvider>
+              </EnterpriseProtectedRoute>
+            </EnterpriseAuthProvider>
           }
         />
         <Route
           path="/enterprise/documents"
           element={
-            <ABACProvider>
-              <EnterpriseLayout>
-                <DocumentsPage />
-              </EnterpriseLayout>
-            </ABACProvider>
+            <EnterpriseAuthProvider>
+              <EnterpriseProtectedRoute>
+                <ABACProvider>
+                  <EnterpriseLayout>
+                    <DocumentsPage />
+                  </EnterpriseLayout>
+                </ABACProvider>
+              </EnterpriseProtectedRoute>
+            </EnterpriseAuthProvider>
           }
         />
         <Route
           path="/enterprise/access"
           element={
-            <ABACProvider>
-              <EnterpriseLayout>
-                <AccessControlPage />
-              </EnterpriseLayout>
-            </ABACProvider>
+            <EnterpriseAuthProvider>
+              <EnterpriseProtectedRoute>
+                <ABACProvider>
+                  <EnterpriseLayout>
+                    <AccessControlPage />
+                  </EnterpriseLayout>
+                </ABACProvider>
+              </EnterpriseProtectedRoute>
+            </EnterpriseAuthProvider>
           }
         />
         <Route
           path="/enterprise/chat"
           element={
-            <ABACProvider>
-              <EnterpriseLayout>
-                <DocumentSelectionProvider>
-                  <ChatPage />
-                </DocumentSelectionProvider>
-              </EnterpriseLayout>
-            </ABACProvider>
+            <EnterpriseAuthProvider>
+              <EnterpriseProtectedRoute>
+                <ABACProvider>
+                  <EnterpriseLayout>
+                    <DocumentSelectionProvider>
+                      <ChatPage />
+                    </DocumentSelectionProvider>
+                  </EnterpriseLayout>
+                </ABACProvider>
+              </EnterpriseProtectedRoute>
+            </EnterpriseAuthProvider>
           }
         />
         <Route
           path="/enterprise/folders"
           element={
-            <ABACProvider>
-              <EnterpriseLayout>
-                <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-2">Folders</h2>
-                  <p className="text-sm text-gray-500">Organize documents into folders with inherited permissions</p>
-                </div>
-              </EnterpriseLayout>
-            </ABACProvider>
+            <EnterpriseAuthProvider>
+              <EnterpriseProtectedRoute>
+                <ABACProvider>
+                  <EnterpriseLayout>
+                    <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
+                      <h2 className="text-lg font-semibold text-gray-900 mb-2">Folders</h2>
+                      <p className="text-sm text-gray-500">Organize documents into folders with inherited permissions</p>
+                    </div>
+                  </EnterpriseLayout>
+                </ABACProvider>
+              </EnterpriseProtectedRoute>
+            </EnterpriseAuthProvider>
           }
         />
         <Route
           path="/enterprise/users"
           element={
-            <ABACProvider>
-              <EnterpriseLayout>
-                <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-2">User Management</h2>
-                  <p className="text-sm text-gray-500">Manage users and their ABAC attributes</p>
-                </div>
-              </EnterpriseLayout>
-            </ABACProvider>
+            <EnterpriseAuthProvider>
+              <EnterpriseProtectedRoute>
+                <ABACProvider>
+                  <EnterpriseLayout>
+                    <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
+                      <h2 className="text-lg font-semibold text-gray-900 mb-2">User Management</h2>
+                      <p className="text-sm text-gray-500">Manage users and their ABAC attributes</p>
+                    </div>
+                  </EnterpriseLayout>
+                </ABACProvider>
+              </EnterpriseProtectedRoute>
+            </EnterpriseAuthProvider>
           }
         />
         <Route
           path="/enterprise/analytics"
           element={
-            <ABACProvider>
-              <EnterpriseLayout>
-                <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-2">Analytics</h2>
-                  <p className="text-sm text-gray-500">Document access analytics and insights</p>
-                </div>
-              </EnterpriseLayout>
-            </ABACProvider>
+            <EnterpriseAuthProvider>
+              <EnterpriseProtectedRoute>
+                <ABACProvider>
+                  <EnterpriseLayout>
+                    <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
+                      <h2 className="text-lg font-semibold text-gray-900 mb-2">Analytics</h2>
+                      <p className="text-sm text-gray-500">Document access analytics and insights</p>
+                    </div>
+                  </EnterpriseLayout>
+                </ABACProvider>
+              </EnterpriseProtectedRoute>
+            </EnterpriseAuthProvider>
           }
         />
         <Route
           path="/enterprise/settings"
           element={
-            <ABACProvider>
-              <EnterpriseLayout>
-                <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-2">Settings</h2>
-                  <p className="text-sm text-gray-500">Configure ABAC policies and enterprise settings</p>
-                </div>
-              </EnterpriseLayout>
-            </ABACProvider>
+            <EnterpriseAuthProvider>
+              <EnterpriseProtectedRoute>
+                <ABACProvider>
+                  <EnterpriseLayout>
+                    <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
+                      <h2 className="text-lg font-semibold text-gray-900 mb-2">Settings</h2>
+                      <p className="text-sm text-gray-500">Configure ABAC policies and enterprise settings</p>
+                    </div>
+                  </EnterpriseLayout>
+                </ABACProvider>
+              </EnterpriseProtectedRoute>
+            </EnterpriseAuthProvider>
           }
         />
 
