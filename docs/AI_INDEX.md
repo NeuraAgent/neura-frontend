@@ -44,7 +44,27 @@ When generating code for neura-frontend, ALWAYS read these documents in order:
 - API Integration (apiClient, socketService)
 - Performance Optimization (Code splitting, Memoization)
 
-## 3. DOMAIN.md
+## 3. ENTERPRISE_AUTH.md
+
+**Purpose**: Enterprise Authentication & ABAC system  
+**Read this for**:
+
+- Enterprise authentication architecture
+- ABAC (Attribute-Based Access Control) integration
+- Protected route implementation
+- Auth service patterns
+- User roles and permissions
+
+**Key sections**:
+
+- Architecture (Auth + ABAC layers)
+- Folder Structure (features/auth, features/abac)
+- Components (AuthContext, ABAC Context, Protected Routes)
+- Authentication Flow
+- ABAC Integration with Auth
+- TypeScript Types
+
+## 4. DOMAIN.md
 
 **Purpose**: Business domain and user workflows  
 **Read this for**:
@@ -111,6 +131,7 @@ neura-frontend/docs/
 ├── AI_RULES.md          # Coding rules and standards
 ├── ARCHITECTURE.md      # System architecture
 ├── DOMAIN.md            # Business domain knowledge
+├── ENTERPRISE_AUTH.md   # Enterprise Authentication & ABAC
 ├── TECHNICAL_SPECIFICATION.md  # Detailed technical spec
 └── PRODUCT_DOCUMENT.md  # Product requirements
 ```
@@ -127,7 +148,14 @@ When generating code, read in this priority:
 2. ARCHITECTURE.md - System structure
 3. DOMAIN.md - Business context
 
-**Priority 2 (REFERENCE)**: 4. TECHNICAL_SPECIFICATION.md - Detailed specs 5. PRODUCT_DOCUMENT.md - Product requirements
+**Priority 2 (FEATURE SPECIFIC)**:
+
+4. ENTERPRISE_AUTH.md - When working on enterprise auth or ABAC
+
+**Priority 3 (REFERENCE)**:
+
+5. TECHNICAL_SPECIFICATION.md - Detailed specs
+6. PRODUCT_DOCUMENT.md - Product requirements
 
 ---
 
@@ -199,6 +227,23 @@ When generating code, read in this priority:
 5. Handle loading state
 6. Clear form on success
 
+### Scenario: Add enterprise feature with auth/ABAC
+
+**Read**:
+
+1. ENTERPRISE_AUTH.md → Authentication Flow, ABAC Integration
+2. AI_RULES.md → Component Pattern
+3. ARCHITECTURE.md → Features structure
+
+**Steps**:
+
+1. Import from `@/features/auth` and `@/features/abac`
+2. Use `useEnterpriseAuth()` for auth state
+3. Use `useABAC()` for permission checks
+4. Wrap routes with `EnterpriseProtectedRoute`
+5. Check permissions before rendering sensitive UI
+6. Handle unauthorized access gracefully
+
 ---
 
 ## Key Principles (Quick Reminder)
@@ -224,6 +269,6 @@ If documentation is unclear or outdated:
 
 ---
 
-**Last Updated**: 2025-02-27  
-**Version**: 1.0  
+**Last Updated**: 2025-03-30  
+**Version**: 1.1  
 **Maintained by**: NeuraAgent Team

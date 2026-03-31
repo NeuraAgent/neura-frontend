@@ -152,6 +152,19 @@ neura-frontend/
 │   │   ├── userStore.ts        # User state
 │   │   └── introTourStore.ts   # Tour state
 │   │
+│   ├── features/               # Feature modules
+│   │   ├── auth/               # Enterprise Authentication
+│   │   │   ├── authService.ts
+│   │   │   ├── EnterpriseAuthContext.tsx
+│   │   │   ├── EnterpriseProtectedRoute.tsx
+│   │   │   ├── types.ts
+│   │   │   └── index.ts
+│   │   └── abac/               # Attribute-Based Access Control
+│   │       ├── ABACContext.tsx
+│   │       ├── engine.ts
+│   │       ├── types.ts
+│   │       └── index.ts
+│   │
 │   ├── hooks/                  # Custom hooks
 │   │   └── useErrorHandler.ts
 │   │
@@ -232,7 +245,7 @@ App
 
 ### 1. React Context (Global State)
 
-**AuthContext** - Authentication state
+**AuthContext** - Main Neura Authentication state
 
 ```typescript
 interface AuthContextType {
@@ -243,6 +256,34 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   signUp: (data: SignUpRequest) => Promise<void>;
+}
+```
+
+**EnterpriseAuthContext** - Enterprise Authentication (separate system)
+
+```typescript
+interface EnterpriseAuthContextValue {
+  user: EnterpriseUser | null;
+  accessToken: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
+}
+```
+
+**ABACContext** - Attribute-Based Access Control (integrated with EnterpriseAuth)
+
+```typescript
+interface ABACContextValue {
+  currentUser: EnterpriseUser;
+  documents: EnterpriseDocument[];
+  accessLogs: AccessLog[];
+  checkAccess: (documentId: string, action: string) => AccessDecision;
+  getAccessibleDocuments: () => EnterpriseDocument[];
+  switchUser: (userId: string) => void;
+  clearLogs: () => void;
 }
 ```
 
@@ -679,5 +720,5 @@ VITE_ENABLE_INTRO_TOUR=true
 
 ---
 
-**Last Updated**: 2025-02-27  
-**Version**: 1.0
+**Last Updated**: 2025-03-30  
+**Version**: 1.1
