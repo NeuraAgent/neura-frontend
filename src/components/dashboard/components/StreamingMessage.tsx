@@ -3,7 +3,7 @@
  * Displays streaming AI response with typing indicator
  */
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { CodeBlock } from 'react-code-blocks';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -17,8 +17,16 @@ interface StreamingMessageProps {
 export const StreamingMessage: React.FC<StreamingMessageProps> = ({
   content,
 }) => {
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [content]);
+
   return (
-    <div className="w-full">
+    <div className="w-full" ref={contentRef}>
       <div className="max-w-3xl mx-auto px-4 py-6">
         <div className="flex items-start gap-3">
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] flex items-center justify-center flex-shrink-0 shadow-sm mt-1">
@@ -69,13 +77,13 @@ export const StreamingMessage: React.FC<StreamingMessageProps> = ({
               {/* Typing indicator */}
               <div className="flex items-center mt-3">
                 <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce"></div>
                   <div
-                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                    className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce"
                     style={{ animationDelay: '0.1s' }}
                   ></div>
                   <div
-                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                    className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce"
                     style={{ animationDelay: '0.2s' }}
                   ></div>
                 </div>

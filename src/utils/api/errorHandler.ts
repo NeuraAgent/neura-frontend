@@ -44,7 +44,6 @@ export class ApiErrorHandler {
    */
   static shouldShowToast(errorIdentifier: string): boolean {
     if (this.shownToasts.has(errorIdentifier)) {
-      console.warn('⚠️ Toast already shown for this error, skipping');
       return false;
     }
 
@@ -197,7 +196,6 @@ export class ApiErrorHandler {
 
     // Check for duplicates
     if (this.isDuplicateError(errorId)) {
-      console.warn('⚠️ Duplicate error detected, skipping');
       return { handled: true, errorInfo };
     }
 

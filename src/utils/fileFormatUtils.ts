@@ -46,10 +46,6 @@ async function formatDocxToMarkdown(file: File): Promise<string> {
     // Use mammoth to convert DOCX to HTML
     const result = await mammoth.convertToHtml({ arrayBuffer });
 
-    if (result.messages.length > 0) {
-      console.warn('Mammoth conversion warnings:', result.messages);
-    }
-
     // Convert HTML to Markdown using Turndown
     const turndownService = new TurndownService({
       headingStyle: 'atx',

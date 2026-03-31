@@ -15,9 +15,9 @@ import IntroTour from '@/components/IntroTour';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useLogout } from '@/hooks/useLogout';
+import { ocrService } from '@/services/ocrService';
 import { useIntroTourStore } from '@/stores/introTourStore';
 import { useUserStore } from '@/stores/userStore';
-import { ocrService } from '@/services/ocrService';
 
 import { ChatInputWithImages } from './dashboard/components/ChatInputWithImages';
 import { ChatMessage } from './dashboard/components/ChatMessage';
@@ -27,6 +27,7 @@ import { EmptyState } from './dashboard/components/EmptyState';
 import { LoadingIndicator } from './dashboard/components/LoadingIndicator';
 import { MobileOverlay } from './dashboard/components/MobileOverlay';
 import { StreamingMessage } from './dashboard/components/StreamingMessage';
+import { ThinkingStatus } from './dashboard/components/ThinkingStatus';
 import { useClipboard } from './dashboard/hooks/useClipboard';
 import { useMessageSender } from './dashboard/hooks/useMessageSender';
 import { useModelSelector } from './dashboard/hooks/useModelSelector';
@@ -60,6 +61,7 @@ const Dashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [streamingResponse, setStreamingResponse] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
+  const [thinkingMessage, setThinkingMessage] = useState('');
   const [inputMessage, setInputMessage] = useState('');
   const [insufficientCredits, setInsufficientCredits] = useState(false);
   const [creditError, setCreditError] = useState<string | null>(null);
@@ -97,11 +99,16 @@ const Dashboard: React.FC = () => {
     setStreamingResponse(response);
   }, []);
 
+  const handleThinkingMessageChange = useCallback((message: string) => {
+    setThinkingMessage(message);
+  }, []);
+
   const { sendMessage, isSendingRef } = useMessageSender({
     onMessageAdd: message => setMessages(prev => [...prev, message]),
-    onMessageUpdate: (id, updates) => setMessages(prev => 
-      prev.map(msg => msg.id === id ? { ...msg, ...updates } : msg)
-    ),
+    onMessageUpdate: (id, updates) =>
+      setMessages(prev =>
+        prev.map(msg => (msg.id === id ? { ...msg, ...updates } : msg))
+      ),
     onLoadingChange: setIsLoading,
     onCreditError: error => {
       setInsufficientCredits(true);
@@ -114,6 +121,7 @@ const Dashboard: React.FC = () => {
     onLoadingChange: handleLoadingChange,
     onStreamingChange: handleStreamingChange,
     onStreamingResponseChange: handleStreamingResponseChange,
+    onThinkingMessageChange: handleThinkingMessageChange,
     isSendingRef,
   });
 
@@ -171,14 +179,14 @@ const Dashboard: React.FC = () => {
 
           for (const file of images) {
             const base64 = await fileToBase64(file);
-            console.log(`[OCR Request] Starting OCR for network tab check - Image:`, file.name);
             const ocrResponse = await ocrService.extractTextFromImage(base64);
-            console.log('[OCR Response Complete]:', ocrResponse);
-
             if (ocrResponse.success && ocrResponse.extracted_text) {
               extractedTexts.push(ocrResponse.extracted_text);
             } else {
-              console.error(`[OCR Error for image ${file.name}]:`, ocrResponse.error);
+              console.error(
+                `[OCR Error for image ${file.name}]:`,
+                ocrResponse.error
+              );
             }
           }
 
@@ -247,7 +255,7 @@ const Dashboard: React.FC = () => {
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const files = Array.from(e.dataTransfer.files);
       setDroppedFiles(files);
@@ -255,7 +263,7 @@ const Dashboard: React.FC = () => {
   }, []);
 
   return (
-    <div 
+    <div
       className="min-h-screen bg-gray-50 flex relative"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -266,12 +274,26 @@ const Dashboard: React.FC = () => {
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-blue-500/10 backdrop-blur-sm border-2 border-dashed border-blue-500 rounded-lg m-4 pointer-events-none transition-all">
           <div className="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              <svg
+                className="w-8 h-8 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-gray-800">Drop images here</h3>
-            <p className="text-sm text-gray-500 mt-2">Add images to your message automatically</p>
+            <h3 className="text-xl font-semibold text-gray-800">
+              Drop images here
+            </h3>
+            <p className="text-sm text-gray-500 mt-2">
+              Add images to your message automatically
+            </p>
           </div>
         </div>
       )}
@@ -328,11 +350,23 @@ const Dashboard: React.FC = () => {
                 ))
               )}
 
-              {isStreaming && streamingResponse && (
-                <StreamingMessage content={streamingResponse} />
+              {thinkingMessage && !streamingResponse && (
+                <>
+                  <ThinkingStatus message={thinkingMessage} />
+                </>
               )}
 
-              {isLoading && !streamingResponse && <LoadingIndicator />}
+              {isStreaming && streamingResponse && (
+                <>
+                  <StreamingMessage content={streamingResponse} />
+                </>
+              )}
+
+              {isLoading && !streamingResponse && !thinkingMessage && (
+                <>
+                  <LoadingIndicator />
+                </>
+              )}
 
               <div ref={messagesEndRef} />
             </div>

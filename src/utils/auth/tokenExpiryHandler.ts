@@ -24,7 +24,6 @@ export class TokenExpiryHandler {
   static handleTokenExpiry(options: TokenExpiryOptions = {}): void {
     // Prevent multiple simultaneous calls
     if (this.isHandling) {
-      console.warn('Token expiry already being handled');
       return;
     }
 
@@ -106,7 +105,6 @@ export class TokenExpiryHandler {
       });
     } catch {
       // Fallback to alert if toast service not available
-      console.warn(message);
     }
   }
 

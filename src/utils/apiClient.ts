@@ -39,22 +39,13 @@ const DEV_TOKEN_STORAGE = {
       localStorage.setItem('dev_access_token', accessToken);
       localStorage.setItem('dev_refresh_token', refreshToken);
       localStorage.setItem('dev_token_timestamp', timestamp);
-      console.log('🔓 [DEV] Tokens stored in localStorage at', timestamp);
-      console.log('🔓 [DEV] Token lengths:', {
-        access: accessToken.length,
-        refresh: refreshToken.length,
-      });
     }
   },
   clearTokens: (): void => {
     if (env.NODE_ENV === 'development') {
-      const hadTokens = !!localStorage.getItem('dev_access_token');
       localStorage.removeItem('dev_access_token');
       localStorage.removeItem('dev_refresh_token');
       localStorage.removeItem('dev_token_timestamp');
-      if (hadTokens) {
-        console.log('🔓 [DEV] Tokens cleared from localStorage');
-      }
     }
   },
 };
@@ -136,19 +127,6 @@ export function createApiClient(baseURL?: string): AxiosInstance {
         const accessToken = DEV_TOKEN_STORAGE.getAccessToken();
         if (accessToken) {
           config.headers['Authorization'] = `Bearer ${accessToken}`;
-          console.log('🔓 [DEV] Added Authorization header to request:', {
-            url: config.url,
-            method: config.method,
-            tokenLength: accessToken.length,
-          });
-        } else {
-          console.warn(
-            '⚠️ [DEV] No access token found in localStorage for request:',
-            {
-              url: config.url,
-              method: config.method,
-            }
-          );
         }
       }
 

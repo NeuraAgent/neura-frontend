@@ -23,7 +23,6 @@ export class AxiosInterceptor {
    */
   static setup(axiosInstance: AxiosInstance = axios): void {
     if (this.isSetup) {
-      console.warn('Axios interceptors already setup');
       return;
     }
 

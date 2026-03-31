@@ -41,8 +41,14 @@ export const useMessageSender = ({
     isSendingRef.current = true;
 
     try {
-      const creditCheck = await paymentService.checkCredits(CREDIT_CHECK_ESTIMATE);
-      if (creditCheck.success && creditCheck.data && !creditCheck.data.hasCredits) {
+      const creditCheck = await paymentService.checkCredits(
+        CREDIT_CHECK_ESTIMATE
+      );
+      if (
+        creditCheck.success &&
+        creditCheck.data &&
+        !creditCheck.data.hasCredits
+      ) {
         onCreditError(`Insufficient credits...`);
         isSendingRef.current = false;
         return false;
@@ -58,16 +64,16 @@ export const useMessageSender = ({
       let finalBackendContent = params.content;
       if (params.getBackendContent) {
         finalBackendContent = await params.getBackendContent();
-        
+
         // Once background content is fetched (OCR done), update images to 'done'
         if (onMessageUpdate && userMessage.id && params.images) {
-           const updatedImages = params.images.map(img => ({ ...img, status: 'done' as const }));
-           onMessageUpdate(userMessage.id, { images: updatedImages });
+          const updatedImages = params.images.map(img => ({
+            ...img,
+            status: 'done' as const,
+          }));
+          onMessageUpdate(userMessage.id, { images: updatedImages });
         }
       }
-
-      console.log('[Backend Payload Final Content - Verify Network Tab]:', finalBackendContent);
-
       await socketService.execute({
         version: 'v1.0',
         query: finalBackendContent,
@@ -83,11 +89,14 @@ export const useMessageSender = ({
     } catch (error) {
       onLoadingChange(false);
       isSendingRef.current = false;
-      
+
       // On error, mark images as error
       if (onMessageUpdate && userMessage.id && params.images) {
-         const updatedImages = params.images.map(img => ({ ...img, status: 'error' as const }));
-         onMessageUpdate(userMessage.id, { images: updatedImages });
+        const updatedImages = params.images.map(img => ({
+          ...img,
+          status: 'error' as const,
+        }));
+        onMessageUpdate(userMessage.id, { images: updatedImages });
       }
 
       if (isCreditError(error)) {

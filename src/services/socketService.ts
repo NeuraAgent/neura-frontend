@@ -160,7 +160,6 @@ class SocketService {
    */
   on(event: string, callback: SocketEventCallback): void {
     if (!this.socket) {
-      console.warn('⚠️ Socket not initialized. Call connect() first.');
       return;
     }
 
@@ -180,6 +179,15 @@ class SocketService {
     } else {
       this.socket.off(event);
     }
+  }
+
+  /**
+   * Register progress_update event
+   */
+  onProgressUpdate(
+    callback: (data: { step: string; message: string }) => void
+  ): void {
+    this.on('progress_update', callback);
   }
 
   /**

@@ -17,18 +17,13 @@ export const useLogout = () => {
   const isLoggingOutRef = useRef(false);
 
   const logout = useCallback(
-    async (reason?: string, redirectPath?: string) => {
+    async (_: string, redirectPath?: string) => {
       // Prevent multiple simultaneous logout calls
       if (isLoggingOutRef.current) {
-        console.warn('⚠️ Logout already in progress, skipping...');
         return;
       }
 
       isLoggingOutRef.current = true;
-
-      if (reason) {
-        console.warn(`🚪 Logging out user: ${reason}`);
-      }
 
       try {
         // 1. Call backend logout endpoint to blacklist token and clear HTTP-only cookies

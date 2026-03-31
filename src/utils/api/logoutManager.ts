@@ -42,19 +42,15 @@ export class LogoutManager {
   static logout(reason: string): void {
     // Prevent multiple simultaneous logout calls
     if (this.isLoggingOut) {
-      console.warn('⚠️ Logout already in progress, skipping...');
       return;
     }
 
     // Check if we're already on an auth page
     if (this.isOnAuthPage()) {
-      console.warn('⚠️ Already on auth page, skipping logout to prevent loop');
       return;
     }
 
     this.isLoggingOut = true;
-    console.warn(`🚪 Logging out user: ${reason}`);
-
     // Cancel all pending requests
     RequestManager.cancelAllRequests();
 

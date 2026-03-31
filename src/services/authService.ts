@@ -27,22 +27,9 @@ class AuthService {
 
       // In DEV mode, store tokens in localStorage for Authorization header
       if (env.NODE_ENV === 'development' && data.success && data.data) {
-        console.log(
-          '🔓 [DEV] Login successful, storing tokens in localStorage'
-        );
-        console.log('🔓 [DEV] Response data:', {
-          hasAccessToken: !!data.data.accessToken,
-          hasToken: !!data.data.token,
-          hasRefreshToken: !!data.data.refreshToken,
-          hasRefresh_token: !!data.data.refresh_token,
-        });
         const accessToken = data.data.accessToken || data.data.token;
         const refreshToken = data.data.refreshToken || data.data.refresh_token;
         if (accessToken && refreshToken) {
-          console.log('🔓 [DEV] Storing tokens:', {
-            accessTokenLength: accessToken.length,
-            refreshTokenLength: refreshToken.length,
-          });
           DEV_TOKEN_STORAGE.setTokens(accessToken, refreshToken);
         } else {
           console.error('❌ [DEV] Tokens not found in response:', data.data);

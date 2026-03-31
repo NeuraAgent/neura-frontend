@@ -18,6 +18,7 @@ interface UseSocketProps {
   onLoadingChange: (isLoading: boolean) => void;
   onStreamingChange: (isStreaming: boolean) => void;
   onStreamingResponseChange: (response: string) => void;
+  onThinkingMessageChange: (message: string) => void;
   isSendingRef: MutableRefObject<boolean>;
 }
 
@@ -26,6 +27,7 @@ export const useSocket = ({
   onLoadingChange,
   onStreamingChange,
   onStreamingResponseChange,
+  onThinkingMessageChange,
   isSendingRef,
 }: UseSocketProps) => {
   const [isConnected, setIsConnected] = useState(false);
@@ -35,6 +37,7 @@ export const useSocket = ({
     onLoadingChange,
     onStreamingChange,
     onStreamingResponseChange,
+    onThinkingMessageChange,
   });
 
   // Update callbacks ref without triggering reconnection
@@ -44,12 +47,14 @@ export const useSocket = ({
       onLoadingChange,
       onStreamingChange,
       onStreamingResponseChange,
+      onThinkingMessageChange,
     };
   }, [
     onMessageReceived,
     onLoadingChange,
     onStreamingChange,
     onStreamingResponseChange,
+    onThinkingMessageChange,
   ]);
 
   useEffect(() => {
@@ -57,23 +62,26 @@ export const useSocket = ({
       try {
         await socketService.connect();
         setIsConnected(true);
-
         // Setup event listeners
+        socketService.onProgressUpdate(data => {
+          callbacksRef.current.onThinkingMessageChange(data.message);
+        });
+
         socketService.onExecutionStarted(() => {
           callbacksRef.current.onStreamingChange(true);
+          callbacksRef.current.onThinkingMessageChange('');
           streamingResponseRef.current = '';
           callbacksRef.current.onStreamingResponseChange('');
         });
 
-        socketService.onAgentThinking(() => {
-          // Simplified - no verbose status updates
+        socketService.onAgentThinking(data => {
+          callbacksRef.current.onThinkingMessageChange(data.message);
         });
-
-        socketService.onToolCalling(() => {
-          // Simplified - no verbose status updates
-        });
-
         socketService.onResponseChunk(data => {
+          if (streamingResponseRef.current === '') {
+            callbacksRef.current.onStreamingChange(true);
+            callbacksRef.current.onThinkingMessageChange('');
+          }
           streamingResponseRef.current += data.chunk;
           callbacksRef.current.onStreamingResponseChange(
             streamingResponseRef.current
@@ -83,6 +91,7 @@ export const useSocket = ({
         socketService.onExecutionComplete(data => {
           callbacksRef.current.onLoadingChange(false);
           callbacksRef.current.onStreamingChange(false);
+          callbacksRef.current.onThinkingMessageChange('');
           isSendingRef.current = false;
 
           const aiResponse =
@@ -102,6 +111,7 @@ export const useSocket = ({
         socketService.onExecutionError(data => {
           callbacksRef.current.onLoadingChange(false);
           callbacksRef.current.onStreamingChange(false);
+          callbacksRef.current.onThinkingMessageChange('');
           isSendingRef.current = false;
 
           const errorMessage = createErrorMessage(data.error);
@@ -111,6 +121,7 @@ export const useSocket = ({
           callbacksRef.current.onStreamingResponseChange('');
         });
       } catch (error) {
+        console.error('[useSocket] ❌ Socket initialization failed:', error);
         setIsConnected(false);
       }
     };

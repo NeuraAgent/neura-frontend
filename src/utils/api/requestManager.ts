@@ -44,7 +44,6 @@ export class RequestManager {
 
     // Block non-auth requests on auth pages
     if (isAuthPage) {
-      console.warn('⚠️ Blocking request on auth page:', config.url);
       return false;
     }
 
