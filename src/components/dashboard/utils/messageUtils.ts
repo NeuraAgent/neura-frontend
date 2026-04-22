@@ -4,6 +4,7 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
+
 import { Message, MessageImage } from '../types';
 
 export const createMessage = (
@@ -18,8 +19,10 @@ export const createMessage = (
   images,
 });
 
-export const createUserMessage = (content: string, images?: MessageImage[]): Message =>
-  createMessage('user', content, images);
+export const createUserMessage = (
+  content: string,
+  images?: MessageImage[]
+): Message => createMessage('user', content, images);
 
 export const createAssistantMessage = (content: string): Message =>
   createMessage('assistant', content);

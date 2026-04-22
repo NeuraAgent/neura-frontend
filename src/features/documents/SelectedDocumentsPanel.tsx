@@ -1,19 +1,30 @@
-import React from 'react';
 import { X, FileText } from 'lucide-react';
-import { useDocumentSelection } from './DocumentSelectionContext';
+import React from 'react';
+
 import { useABAC } from '@/features/abac/ABACContext';
 import { SENSITIVITY_CONFIG } from '@/features/abac/types';
 
+import { useDocumentSelection } from './DocumentSelectionContext';
+
 export function SelectedDocumentsPanel() {
-  const { selectedDocumentIds, removeDocument, clearSelection, selectionCount } = useDocumentSelection();
+  const {
+    selectedDocumentIds,
+    removeDocument,
+    clearSelection,
+    selectionCount,
+  } = useDocumentSelection();
   const { accessibleDocuments } = useABAC();
 
-  const selectedDocs = accessibleDocuments.filter(doc => selectedDocumentIds.includes(doc.id));
+  const selectedDocs = accessibleDocuments.filter(doc =>
+    selectedDocumentIds.includes(doc.id)
+  );
 
   if (selectionCount === 0) {
     return (
       <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-        <p className="text-xs text-gray-600 text-center">No documents selected yet</p>
+        <p className="text-xs text-gray-600 text-center">
+          No documents selected yet
+        </p>
       </div>
     );
   }
@@ -38,7 +49,8 @@ export function SelectedDocumentsPanel() {
       {/* Selected Documents */}
       <div className="space-y-2 max-h-64 overflow-y-auto">
         {selectedDocs.map(doc => {
-          const sensitivityConfig = SENSITIVITY_CONFIG[doc.attributes.sensitivity];
+          const sensitivityConfig =
+            SENSITIVITY_CONFIG[doc.attributes.sensitivity];
 
           return (
             <div
@@ -79,7 +91,8 @@ export function SelectedDocumentsPanel() {
       <div className="rounded-lg bg-blue-50 p-2.5 text-xs text-blue-900">
         <p className="font-medium">Ready for AI chat</p>
         <p className="text-blue-700">
-          {selectionCount} document{selectionCount !== 1 ? 's' : ''} will be used as context
+          {selectionCount} document{selectionCount !== 1 ? 's' : ''} will be
+          used as context
         </p>
       </div>
     </div>

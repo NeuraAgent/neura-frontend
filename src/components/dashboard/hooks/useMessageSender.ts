@@ -53,7 +53,9 @@ export const useMessageSender = ({
         isSendingRef.current = false;
         return false;
       }
-    } catch (e) {}
+    } catch {
+      // Ignore credit check errors
+    }
 
     const displayMsg = params.displayContent || params.content;
     const userMessage = createUserMessage(displayMsg, params.images);

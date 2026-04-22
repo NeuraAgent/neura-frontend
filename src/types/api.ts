@@ -3,7 +3,7 @@
  * Used for request/response validation and TypeScript safety
  */
 
-import type { EnterpriseDocument, EnterpriseUser, AccessDecision } from '@/features/abac/types';
+import type { EnterpriseDocument, EnterpriseUser } from '@/features/abac/types';
 
 // API Response Wrapper
 export interface ApiResponse<T> {

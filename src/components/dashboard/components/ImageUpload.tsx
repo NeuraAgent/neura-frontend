@@ -16,7 +16,13 @@ interface ImageUploadProps {
   maxSizeMB?: number;
 }
 
-const ACCEPTED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+const ACCEPTED_TYPES = [
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+];
 const MAX_SIZE_MB = 10;
 
 export const ImageUpload: React.FC<ImageUploadProps> = ({

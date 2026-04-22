@@ -493,12 +493,13 @@ const IntroTour: React.FC<IntroTourProps> = ({ enabled = true }) => {
             <button
               key={index}
               onClick={() => setCurrentStep(index)}
-              className={`transition-all duration-300 rounded-full ${index === currentStep
+              className={`transition-all duration-300 rounded-full ${
+                index === currentStep
                   ? 'w-8 h-2 bg-gray-600'
                   : index < currentStep
                     ? 'w-2 h-2 bg-gray-400'
                     : 'w-2 h-2 bg-gray-200'
-                }`}
+              }`}
               aria-label={`Go to step ${index + 1}`}
             />
           ))}

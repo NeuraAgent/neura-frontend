@@ -1,4 +1,13 @@
-import { X, Download, Clock, FileText, Shield, User, Globe, Tag, AlertTriangle } from 'lucide-react';
+import {
+  X,
+  Download,
+  Clock,
+  FileText,
+  Shield,
+  Globe,
+  Tag,
+  AlertTriangle,
+} from 'lucide-react';
 import React from 'react';
 
 import { useABAC } from '@/features/abac';
@@ -49,7 +58,10 @@ export function DocumentViewer({ document, onClose }: DocumentViewerProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
 
       {/* Modal */}
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
@@ -60,7 +72,9 @@ export function DocumentViewer({ document, onClose }: DocumentViewerProps) {
               <FileText className="w-6 h-6 text-gray-600" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-1">{document.title}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-1">
+                {document.title}
+              </h2>
               <div className="flex items-center gap-2">
                 <span
                   className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-md ${sensitivityConfig.bgColor} ${sensitivityConfig.color}`}
@@ -90,8 +104,12 @@ export function DocumentViewer({ document, onClose }: DocumentViewerProps) {
               <div className="flex items-start gap-3">
                 <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-sm font-medium text-red-800 mb-1">Access Denied</h4>
-                  <p className="text-sm text-red-600">{accessDecision.reason}</p>
+                  <h4 className="text-sm font-medium text-red-800 mb-1">
+                    Access Denied
+                  </h4>
+                  <p className="text-sm text-red-600">
+                    {accessDecision.reason}
+                  </p>
                 </div>
               </div>
             </div>
@@ -99,16 +117,24 @@ export function DocumentViewer({ document, onClose }: DocumentViewerProps) {
 
           {/* Description */}
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Description</h3>
-            <p className="text-sm text-gray-600 leading-relaxed">{document.description}</p>
+            <h3 className="text-sm font-medium text-gray-700 mb-2">
+              Description
+            </h3>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              {document.description}
+            </p>
           </div>
 
           {/* Document Content Preview */}
           {accessDecision.allowed && (
             <div className="mb-6">
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Content Preview</h3>
+              <h3 className="text-sm font-medium text-gray-700 mb-2">
+                Content Preview
+              </h3>
               <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                <p className="text-sm text-gray-600 leading-relaxed">{document.content}</p>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {document.content}
+                </p>
               </div>
             </div>
           )}
@@ -118,7 +144,9 @@ export function DocumentViewer({ document, onClose }: DocumentViewerProps) {
             <div className="bg-gray-50 rounded-xl p-4">
               <div className="flex items-center gap-2 text-gray-500 mb-2">
                 <Tag className="w-4 h-4" />
-                <span className="text-xs font-medium uppercase">Department</span>
+                <span className="text-xs font-medium uppercase">
+                  Department
+                </span>
               </div>
               <p className="text-sm font-medium text-gray-900">
                 {DEPARTMENT_LABELS[document.attributes.department]}
@@ -138,9 +166,13 @@ export function DocumentViewer({ document, onClose }: DocumentViewerProps) {
             <div className="bg-gray-50 rounded-xl p-4">
               <div className="flex items-center gap-2 text-gray-500 mb-2">
                 <Clock className="w-4 h-4" />
-                <span className="text-xs font-medium uppercase">Last Updated</span>
+                <span className="text-xs font-medium uppercase">
+                  Last Updated
+                </span>
               </div>
-              <p className="text-sm font-medium text-gray-900">{formatDate(document.updatedAt)}</p>
+              <p className="text-sm font-medium text-gray-900">
+                {formatDate(document.updatedAt)}
+              </p>
             </div>
 
             <div className="bg-gray-50 rounded-xl p-4">
@@ -149,7 +181,8 @@ export function DocumentViewer({ document, onClose }: DocumentViewerProps) {
                 <span className="text-xs font-medium uppercase">File Info</span>
               </div>
               <p className="text-sm font-medium text-gray-900">
-                {document.fileType.toUpperCase()} - {formatFileSize(document.fileSize)}
+                {document.fileType.toUpperCase()} -{' '}
+                {formatFileSize(document.fileSize)}
               </p>
             </div>
           </div>

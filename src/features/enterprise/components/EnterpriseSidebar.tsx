@@ -83,7 +83,10 @@ const adminNavItems: NavItem[] = [
   },
 ];
 
-export function EnterpriseSidebar({ isCollapsed, onToggle }: EnterpriseSidebarProps) {
+export function EnterpriseSidebar({
+  isCollapsed,
+  onToggle,
+}: EnterpriseSidebarProps) {
   const location = useLocation();
   const { accessSummary, currentUser } = useABAC();
 
@@ -94,7 +97,9 @@ export function EnterpriseSidebar({ isCollapsed, onToggle }: EnterpriseSidebarPr
     return location.pathname.startsWith(href);
   };
 
-  const isAdmin = currentUser.attributes.role === 'admin' || currentUser.attributes.role === 'director';
+  const isAdmin =
+    currentUser.attributes.role === 'admin' ||
+    currentUser.attributes.role === 'director';
 
   return (
     <aside
@@ -107,7 +112,9 @@ export function EnterpriseSidebar({ isCollapsed, onToggle }: EnterpriseSidebarPr
         {!isCollapsed && (
           <div className="flex items-center gap-2">
             <Logo variant="icon" size="sm" />
-            <span className="font-heading font-semibold text-gray-900">Enterprise</span>
+            <span className="font-heading font-semibold text-gray-900">
+              Enterprise
+            </span>
           </div>
         )}
         {isCollapsed && (
@@ -118,7 +125,9 @@ export function EnterpriseSidebar({ isCollapsed, onToggle }: EnterpriseSidebarPr
         <button
           onClick={onToggle}
           className={`p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors ${
-            isCollapsed ? 'absolute -right-3 top-5 bg-white border border-gray-200 shadow-sm' : ''
+            isCollapsed
+              ? 'absolute -right-3 top-5 bg-white border border-gray-200 shadow-sm'
+              : ''
           }`}
         >
           {isCollapsed ? (
@@ -166,7 +175,9 @@ export function EnterpriseSidebar({ isCollapsed, onToggle }: EnterpriseSidebarPr
                 </p>
               </div>
             )}
-            {isCollapsed && <div className="pt-4 border-t border-gray-100 mt-4" />}
+            {isCollapsed && (
+              <div className="pt-4 border-t border-gray-100 mt-4" />
+            )}
             <div className="space-y-1">
               {adminNavItems.map(item => (
                 <Link
@@ -196,16 +207,26 @@ export function EnterpriseSidebar({ isCollapsed, onToggle }: EnterpriseSidebarPr
           <div className="bg-gray-50 rounded-xl p-3">
             <div className="flex items-center gap-2 mb-2">
               <Shield className="w-4 h-4 text-gray-500" />
-              <span className="text-xs font-medium text-gray-600">Access Summary</span>
+              <span className="text-xs font-medium text-gray-600">
+                Access Summary
+              </span>
             </div>
             <div className="grid grid-cols-2 gap-2 text-center">
               <div className="bg-white rounded-lg p-2">
-                <p className="text-lg font-semibold text-gray-900">{accessSummary.accessible}</p>
-                <p className="text-[10px] text-gray-500 uppercase">Accessible</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  {accessSummary.accessible}
+                </p>
+                <p className="text-[10px] text-gray-500 uppercase">
+                  Accessible
+                </p>
               </div>
               <div className="bg-white rounded-lg p-2">
-                <p className="text-lg font-semibold text-gray-400">{accessSummary.denied}</p>
-                <p className="text-[10px] text-gray-500 uppercase">Restricted</p>
+                <p className="text-lg font-semibold text-gray-400">
+                  {accessSummary.denied}
+                </p>
+                <p className="text-[10px] text-gray-500 uppercase">
+                  Restricted
+                </p>
               </div>
             </div>
           </div>

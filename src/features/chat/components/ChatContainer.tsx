@@ -1,11 +1,13 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { generateMockResponse } from '../chatService';
-import { MessageList } from './MessageList';
-import { MessageInput } from './MessageInput';
-import { DocumentSelector } from './DocumentSelector';
-import type { ChatMessage } from '../types';
-import { useDocumentSelection } from '../../documents/DocumentSelectionContext';
+
 import { useABAC } from '../../abac/ABACContext';
+import { useDocumentSelection } from '../../documents/DocumentSelectionContext';
+import { generateMockResponse } from '../chatService';
+import type { ChatMessage } from '../types';
+
+import { DocumentSelector } from './DocumentSelector';
+import { MessageInput } from './MessageInput';
+import { MessageList } from './MessageList';
 
 export function ChatContainer() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -16,9 +18,7 @@ export function ChatContainer() {
   // Get selected documents
   const selectedDocuments = useMemo(
     () =>
-      accessibleDocuments.filter(doc =>
-        selectedDocumentIds.includes(doc.id)
-      ),
+      accessibleDocuments.filter(doc => selectedDocumentIds.includes(doc.id)),
     [accessibleDocuments, selectedDocumentIds]
   );
 
@@ -64,7 +64,8 @@ export function ChatContainer() {
         const errorMsg: ChatMessage = {
           id: `msg-${Date.now() + 1}`,
           role: 'assistant',
-          content: 'Sorry, I encountered an error processing your request. Please try again.',
+          content:
+            'Sorry, I encountered an error processing your request. Please try again.',
           timestamp: new Date().toISOString(),
         };
         setMessages(prev => [...prev, errorMsg]);

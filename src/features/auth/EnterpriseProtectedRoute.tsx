@@ -11,7 +11,9 @@ interface EnterpriseProtectedRouteProps {
  * Protected route wrapper for enterprise routes
  * Redirects to login if not authenticated
  */
-export function EnterpriseProtectedRoute({ children }: EnterpriseProtectedRouteProps) {
+export function EnterpriseProtectedRoute({
+  children,
+}: EnterpriseProtectedRouteProps) {
   const { isAuthenticated, isLoading } = useEnterpriseAuth();
 
   // Show loading state while checking auth

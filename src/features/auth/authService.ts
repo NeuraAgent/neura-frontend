@@ -1,5 +1,5 @@
-import { mockUsers } from '@/mocks/users';
 import type { EnterpriseUser } from '@/features/abac/types';
+import { mockUsers } from '@/mocks/users';
 
 // Mock auth token structure
 export interface AuthToken {
@@ -39,7 +39,9 @@ function generateToken(userId: string): string {
 }
 
 // Decode mock token to extract user ID
-function decodeToken(token: string): { userId: string; isExpired: boolean } | null {
+function decodeToken(
+  token: string
+): { userId: string; isExpired: boolean } | null {
   try {
     const parts = token.split('.');
     if (parts.length !== 3) return null;

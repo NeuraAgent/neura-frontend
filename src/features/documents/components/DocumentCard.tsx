@@ -1,14 +1,23 @@
-import { FileText, Download, Lock, Eye, Calendar, User, Tag, Globe } from 'lucide-react';
+import {
+  FileText,
+  Download,
+  Lock,
+  Eye,
+  Calendar,
+  Tag,
+  Globe,
+} from 'lucide-react';
 import React from 'react';
 
 import { useABAC } from '@/features/abac';
-import { useDocumentSelection } from '../DocumentSelectionContext';
 import {
   SENSITIVITY_CONFIG,
   DEPARTMENT_LABELS,
   REGION_LABELS,
   type EnterpriseDocument,
 } from '@/features/abac/types';
+
+import { useDocumentSelection } from '../DocumentSelectionContext';
 
 interface DocumentCardProps {
   document: EnterpriseDocument;
@@ -17,7 +26,12 @@ interface DocumentCardProps {
   showCheckbox?: boolean;
 }
 
-export function DocumentCard({ document, onView, onDownload, showCheckbox = false }: DocumentCardProps) {
+export function DocumentCard({
+  document,
+  onView,
+  onDownload,
+  showCheckbox = false,
+}: DocumentCardProps) {
   const { checkAccess, logAccess } = useABAC();
   const { isSelected, toggleDocument } = useDocumentSelection();
   const accessDecision = checkAccess(document);
@@ -39,7 +53,7 @@ export function DocumentCard({ document, onView, onDownload, showCheckbox = fals
     });
   };
 
-  const getFileIcon = (fileType: string) => {
+  const getFileIcon = (_fileType: string) => {
     return <FileText className="w-5 h-5" />;
   };
 
@@ -144,7 +158,10 @@ export function DocumentCard({ document, onView, onDownload, showCheckbox = fals
               </button>
             </>
           ) : (
-            <div className="flex items-center gap-1 text-gray-400" title={accessDecision.reason}>
+            <div
+              className="flex items-center gap-1 text-gray-400"
+              title={accessDecision.reason}
+            >
               <Lock className="w-4 h-4" />
               <span className="text-[10px]">Restricted</span>
             </div>

@@ -1,5 +1,7 @@
 import React, { useRef, useEffect } from 'react';
+
 import type { ChatMessage } from '../types';
+
 import { CitationList } from './CitationList';
 
 interface MessageListProps {
@@ -37,7 +39,11 @@ export function MessageList({ messages, isLoading }: MessageListProps) {
                   message.role === 'user' ? 'bg-blue-100' : 'bg-gray-100'
                 }`}
               >
-                <span className={message.role === 'user' ? 'text-blue-600' : 'text-gray-600'}>
+                <span
+                  className={
+                    message.role === 'user' ? 'text-blue-600' : 'text-gray-600'
+                  }
+                >
                   {message.role === 'user' ? 'You' : 'AI'}
                 </span>
               </div>
@@ -50,7 +56,9 @@ export function MessageList({ messages, isLoading }: MessageListProps) {
                     : 'bg-gray-50 text-gray-900'
                 }`}
               >
-                <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                  {message.content}
+                </p>
 
                 {/* Citations */}
                 {message.citations && message.citations.length > 0 && (

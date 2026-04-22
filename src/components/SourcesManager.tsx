@@ -208,7 +208,7 @@ const SourcesManager: React.FC<SourcesManagerProps> = ({
       setSources(prev => prev.filter(s => s.id !== sourceId));
       onSourcesChange(selectedSources.filter(id => id !== sourceId));
       setShowDeleteModal(null);
-    } catch (error) {
+    } catch {
       alert('Failed to delete file');
     }
   };

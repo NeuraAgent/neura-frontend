@@ -31,7 +31,7 @@ export const adjustTextareaHeight = (
   if (scrollHeight > TEXTAREA_CONFIG.MAX_HEIGHT) {
     textarea.style.overflowY = 'auto';
     // Ensure the scrollbar is visible immediately
-    // @ts-ignore
+    // @ts-expect-error - scrollbarWidth is available on textarea elements
     textarea.style.scrollbarWidth = 'thin';
   } else {
     textarea.style.overflowY = 'hidden';

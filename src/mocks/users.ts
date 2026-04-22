@@ -48,7 +48,12 @@ export const mockUsers: EnterpriseUser[] = [
       clearance: 'restricted',
       region: 'JP',
       managedDepartments: ['engineering', 'marketing', 'sales'],
-      allowedProjects: ['project-alpha', 'project-beta', 'project-gamma', 'project-delta'],
+      allowedProjects: [
+        'project-alpha',
+        'project-beta',
+        'project-gamma',
+        'project-delta',
+      ],
     },
     isActive: true,
     lastLoginAt: '2026-03-30T08:00:00Z',

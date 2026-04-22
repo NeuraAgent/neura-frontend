@@ -1,5 +1,6 @@
-import type { ChatMessage, Citation } from './types';
 import type { EnterpriseDocument } from '@/features/abac/types';
+
+import type { Citation } from './types';
 
 /**
  * Mock RAG Response Generator
@@ -8,16 +9,19 @@ import type { EnterpriseDocument } from '@/features/abac/types';
 
 const mockResponses = [
   {
-    template: 'Based on the selected documents, here are the key insights: {DOCS} {CONTENT}',
+    template:
+      'Based on the selected documents, here are the key insights: {DOCS} {CONTENT}',
   },
   {
-    template: 'From the documents you selected ({DOCS}), I can provide this analysis: {CONTENT}',
+    template:
+      'From the documents you selected ({DOCS}), I can provide this analysis: {CONTENT}',
   },
   {
     template: 'After reviewing {DOCS}, the answer is: {CONTENT}',
   },
   {
-    template: 'According to the information in {DOCS}, we can conclude: {CONTENT}',
+    template:
+      'According to the information in {DOCS}, we can conclude: {CONTENT}',
   },
 ];
 
@@ -55,7 +59,7 @@ const responsePatterns: Record<string, string[]> = {
 };
 
 export async function generateMockResponse(
-  userQuery: string,
+  _userQuery: string,
   documents: EnterpriseDocument[],
   _delayMs: number = 1500
 ): Promise<{ content: string; citations: Citation[] }> {
@@ -73,10 +77,11 @@ export async function generateMockResponse(
 
   // Build document reference string
   const docTitles = documents.map(d => `"${d.title}"`).join(', ');
-  const docNames = documents.map(d => d.attributes.department).join(', ');
+  // const docNames = documents.map(d => d.attributes.department).join(', ');
 
   // Select response template
-  const template = mockResponses[Math.floor(Math.random() * mockResponses.length)].template;
+  const template =
+    mockResponses[Math.floor(Math.random() * mockResponses.length)].template;
 
   // Get relevant response based on document departments
   const relevantResponses = documents

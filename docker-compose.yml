@@ -6,8 +6,8 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: ${VITE_API_URL:-https://chapel-clara-definition-try.trycloudflare.com}
-        VITE_WEBSOCKET_URL: ${VITE_WEBSOCKET_URL:-wss://chapel-clara-definition-try.trycloudflare.com/api/ws}
+        VITE_API_URL: ${VITE_API_URL:-https://vessel-buys-water-electrical.trycloudflare.com}
+        VITE_WEBSOCKET_URL: ${VITE_WEBSOCKET_URL:-wss://vessel-buys-water-electrical.trycloudflare.com/api/ws}
         VITE_APP_NAME: ${VITE_APP_NAME:-Neura Chat}
         VITE_APP_VERSION: ${VITE_APP_VERSION:-1.0.0}
         VITE_SESSION_TTL: ${VITE_SESSION_TTL:-2592000000}

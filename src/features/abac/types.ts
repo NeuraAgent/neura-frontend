@@ -1,6 +1,13 @@
 // ABAC (Attribute-Based Access Control) Types
 
-export type Department = 'engineering' | 'marketing' | 'sales' | 'hr' | 'finance' | 'legal' | 'executive';
+export type Department =
+  | 'engineering'
+  | 'marketing'
+  | 'sales'
+  | 'hr'
+  | 'finance'
+  | 'legal'
+  | 'executive';
 
 export type Sensitivity = 'public' | 'internal' | 'confidential' | 'restricted';
 
@@ -113,7 +120,10 @@ export const CLEARANCE_LEVELS: Record<Clearance, number> = {
 };
 
 // Helper to check if clearance meets sensitivity requirement
-export function hasSufficientClearance(clearance: Clearance, sensitivity: Sensitivity): boolean {
+export function hasSufficientClearance(
+  clearance: Clearance,
+  sensitivity: Sensitivity
+): boolean {
   return CLEARANCE_LEVELS[clearance] >= SENSITIVITY_LEVELS[sensitivity];
 }
 
@@ -129,11 +139,30 @@ export const DEPARTMENT_LABELS: Record<Department, string> = {
 };
 
 // Sensitivity display with colors
-export const SENSITIVITY_CONFIG: Record<Sensitivity, { label: string; color: string; bgColor: string }> = {
-  public: { label: 'Public', color: 'text-emerald-700', bgColor: 'bg-emerald-50' },
-  internal: { label: 'Internal', color: 'text-blue-700', bgColor: 'bg-blue-50' },
-  confidential: { label: 'Confidential', color: 'text-amber-700', bgColor: 'bg-amber-50' },
-  restricted: { label: 'Restricted', color: 'text-red-700', bgColor: 'bg-red-50' },
+export const SENSITIVITY_CONFIG: Record<
+  Sensitivity,
+  { label: string; color: string; bgColor: string }
+> = {
+  public: {
+    label: 'Public',
+    color: 'text-emerald-700',
+    bgColor: 'bg-emerald-50',
+  },
+  internal: {
+    label: 'Internal',
+    color: 'text-blue-700',
+    bgColor: 'bg-blue-50',
+  },
+  confidential: {
+    label: 'Confidential',
+    color: 'text-amber-700',
+    bgColor: 'bg-amber-50',
+  },
+  restricted: {
+    label: 'Restricted',
+    color: 'text-red-700',
+    bgColor: 'bg-red-50',
+  },
 };
 
 // Region display names

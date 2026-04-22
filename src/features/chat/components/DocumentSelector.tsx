@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { useDocumentSelection } from '../../documents/DocumentSelectionContext';
-import { useABAC } from '../../abac/ABACContext';
+
 import { SENSITIVITY_CONFIG } from '@/features/abac/types';
+
+import { useABAC } from '../../abac/ABACContext';
+import { useDocumentSelection } from '../../documents/DocumentSelectionContext';
 
 interface DocumentSelectorProps {
   selectedCount: number;
@@ -10,13 +12,16 @@ interface DocumentSelectorProps {
 export function DocumentSelector({ selectedCount }: DocumentSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { accessibleDocuments } = useABAC();
-  const { selectedDocumentIds, toggleDocument, clearSelection } = useDocumentSelection();
+  const { selectedDocumentIds, toggleDocument, clearSelection } =
+    useDocumentSelection();
 
   return (
     <div className="space-y-3">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-900">Active Knowledge Base</h3>
+        <h3 className="text-sm font-semibold text-gray-900">
+          Active Knowledge Base
+        </h3>
         {selectedCount > 0 && (
           <button
             onClick={clearSelection}
@@ -30,7 +35,9 @@ export function DocumentSelector({ selectedCount }: DocumentSelectorProps) {
       {/* Active Documents Badge */}
       <div className="flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-2">
         <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100">
-          <span className="text-xs font-semibold text-blue-700">{selectedCount}</span>
+          <span className="text-xs font-semibold text-blue-700">
+            {selectedCount}
+          </span>
         </div>
         <span className="text-sm font-medium text-blue-900">
           {selectedCount === 0
@@ -55,7 +62,8 @@ export function DocumentSelector({ selectedCount }: DocumentSelectorProps) {
           ) : (
             accessibleDocuments.map(doc => {
               const isSelected = selectedDocumentIds.includes(doc.id);
-              const sensitivityConfig = SENSITIVITY_CONFIG[doc.attributes.sensitivity];
+              const sensitivityConfig =
+                SENSITIVITY_CONFIG[doc.attributes.sensitivity];
 
               return (
                 <label
@@ -97,8 +105,10 @@ export function DocumentSelector({ selectedCount }: DocumentSelectorProps) {
       {selectedCount > 0 && (
         <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white p-2.5 text-xs">
           <span className="text-gray-600">
-            <span className="font-semibold text-gray-900">{selectedCount}</span> document
-            {selectedCount !== 1 ? 's' : ''} will be used as context for your questions
+            <span className="font-semibold text-gray-900">{selectedCount}</span>{' '}
+            document
+            {selectedCount !== 1 ? 's' : ''} will be used as context for your
+            questions
           </span>
         </div>
       )}

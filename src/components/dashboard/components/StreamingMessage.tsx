@@ -6,8 +6,8 @@
 import React, { useEffect, useRef } from 'react';
 import { CodeBlock } from 'react-code-blocks';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
+import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 
 interface StreamingMessageProps {
@@ -21,7 +21,10 @@ export const StreamingMessage: React.FC<StreamingMessageProps> = ({
 
   useEffect(() => {
     if (contentRef.current) {
-      contentRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      contentRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
     }
   }, [content]);
 

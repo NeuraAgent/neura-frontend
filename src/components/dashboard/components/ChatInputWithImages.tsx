@@ -1,10 +1,15 @@
-import { Send, Image as ImageIcon, X, Plus, MoreHorizontal, ChevronRight } from 'lucide-react';
+import {
+  Send,
+  Image as ImageIcon,
+  X,
+  Plus,
+  MoreHorizontal,
+  ChevronRight,
+} from 'lucide-react';
 import React, { useState, useRef, forwardRef, useEffect } from 'react';
-import { adjustTextareaHeight } from '../utils/textareaUtils';
 
 import { MODEL_OPTIONS } from '../constants';
-
-
+import { adjustTextareaHeight } from '../utils/textareaUtils';
 
 interface ChatInputWithImagesProps {
   value: string;
@@ -47,12 +52,16 @@ export const ChatInputWithImages = forwardRef<
     // Close menu on outside click
     useEffect(() => {
       const handleClickOutside = (e: MouseEvent) => {
-        if (plusMenuRef.current && !plusMenuRef.current.contains(e.target as Node)) {
+        if (
+          plusMenuRef.current &&
+          !plusMenuRef.current.contains(e.target as Node)
+        ) {
           setIsPlusMenuOpen(false);
         }
       };
       document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
+      return () =>
+        document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
     // Cleanup previews
@@ -82,7 +91,9 @@ export const ChatInputWithImages = forwardRef<
     useEffect(() => {
       if (droppedFiles && droppedFiles.length > 0) {
         // filter images
-        const imageFiles = droppedFiles.filter(f => f.type.startsWith('image/'));
+        const imageFiles = droppedFiles.filter(f =>
+          f.type.startsWith('image/')
+        );
         if (imageFiles.length > 0) {
           const newImages = [...selectedImages, ...imageFiles].slice(0, 3); // max 3
           handleImagesChange(newImages);
@@ -102,7 +113,10 @@ export const ChatInputWithImages = forwardRef<
         return;
       }
 
-      onSend(value.trim(), selectedImages.length > 0 ? selectedImages : undefined);
+      onSend(
+        value.trim(),
+        selectedImages.length > 0 ? selectedImages : undefined
+      );
 
       // Cleanup
       imagePreviews.forEach(url => URL.revokeObjectURL(url));
@@ -167,7 +181,10 @@ export const ChatInputWithImages = forwardRef<
         >
           <div className="flex items-end p-2 relative min-h-[60px]">
             {/* Plus Button with Menu (Absolute Positioned Left) */}
-            <div className="absolute left-2 bottom-[10px] z-20 flex-shrink-0" ref={plusMenuRef}>
+            <div
+              className="absolute left-2 bottom-[10px] z-20 flex-shrink-0"
+              ref={plusMenuRef}
+            >
               {/* Hidden File Input outside conditional render */}
               <input
                 type="file"
@@ -182,9 +199,10 @@ export const ChatInputWithImages = forwardRef<
                 disabled={isLoading}
                 className={`
                   p-2 w-10 h-10 flex items-center justify-center rounded-full transition-colors
-                  ${isPlusMenuOpen || imagePreviews.length > 0
-                    ? 'bg-blue-100 text-blue-600'
-                    : 'text-gray-500 hover:text-gray-800 hover:bg-gray-200'
+                  ${
+                    isPlusMenuOpen || imagePreviews.length > 0
+                      ? 'bg-blue-100 text-blue-600'
+                      : 'text-gray-500 hover:text-gray-800 hover:bg-gray-200'
                   }
                   disabled:opacity-50 disabled:cursor-not-allowed
                 `}
@@ -217,7 +235,7 @@ export const ChatInputWithImages = forwardRef<
                 </div>
               )}
             </div>
-            
+
             {/* Spacer for Plus Button Flow */}
             <div className="w-11 h-10 flex-shrink-0" aria-hidden="true" />
 
@@ -238,7 +256,6 @@ export const ChatInputWithImages = forwardRef<
 
             {/* Right Icons: Model Selector, Send Button (Absolute Positioned Right) */}
             <div className="absolute right-2 bottom-[10px] z-20 flex items-center gap-1">
-
               <select
                 value={selectedModel}
                 onChange={e => onModelChange(e.target.value)}
@@ -255,7 +272,9 @@ export const ChatInputWithImages = forwardRef<
 
               <button
                 onClick={handleSend}
-                disabled={isLoading || (!value.trim() && selectedImages.length === 0)}
+                disabled={
+                  isLoading || (!value.trim() && selectedImages.length === 0)
+                }
                 className="flex-shrink-0 p-2 w-10 h-10 flex items-center justify-center bg-black text-white rounded-full hover:opacity-80 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
                 title="Send message"
               >
@@ -272,7 +291,8 @@ export const ChatInputWithImages = forwardRef<
         {/* Helper Text */}
         {imagePreviews.length > 0 && (
           <p className="text-xs text-gray-500 text-center">
-            {imagePreviews.length} image{imagePreviews.length > 1 ? 's' : ''} selected
+            {imagePreviews.length} image{imagePreviews.length > 1 ? 's' : ''}{' '}
+            selected
           </p>
         )}
       </div>

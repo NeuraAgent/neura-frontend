@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import type { Citation } from '../types';
+
 import { SENSITIVITY_CONFIG } from '@/features/abac/types';
+
+import type { Citation } from '../types';
 
 interface CitationListProps {
   citations: Citation[];
@@ -11,7 +13,9 @@ export function CitationList({ citations }: CitationListProps) {
 
   return (
     <div className="mt-3 border-t border-gray-200 pt-3">
-      <p className="mb-2 text-xs font-semibold text-gray-600 uppercase">Sources</p>
+      <p className="mb-2 text-xs font-semibold text-gray-600 uppercase">
+        Sources
+      </p>
       <div className="space-y-2">
         {citations.map(citation => {
           const sensitivityConfig = SENSITIVITY_CONFIG[citation.sensitivity];
@@ -24,7 +28,9 @@ export function CitationList({ citations }: CitationListProps) {
             >
               {/* Citation Header */}
               <button
-                onClick={() => setExpandedId(isExpanded ? null : citation.documentId)}
+                onClick={() =>
+                  setExpandedId(isExpanded ? null : citation.documentId)
+                }
                 className="w-full text-left"
               >
                 <div className="flex items-start gap-2">
@@ -39,10 +45,14 @@ export function CitationList({ citations }: CitationListProps) {
                       {citation.title}
                     </p>
                     <div className="mt-1 flex items-center gap-2 flex-wrap">
-                      <span className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${sensitivityConfig.bgColor} ${sensitivityConfig.color}`}>
+                      <span
+                        className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${sensitivityConfig.bgColor} ${sensitivityConfig.color}`}
+                      >
                         {sensitivityConfig.label}
                       </span>
-                      <span className="text-gray-500">{citation.department}</span>
+                      <span className="text-gray-500">
+                        {citation.department}
+                      </span>
                     </div>
                   </div>
 
@@ -56,7 +66,9 @@ export function CitationList({ citations }: CitationListProps) {
               {/* Citation Preview */}
               {isExpanded && (
                 <div className="mt-2 border-t border-gray-200 pt-2 text-xs leading-relaxed text-gray-700">
-                  <p className="line-clamp-3">"{citation.preview}"</p>
+                  <p className="line-clamp-3">
+                    &ldquo;{citation.preview}&rdquo;
+                  </p>
                   <p className="mt-1 text-gray-500">
                     — Page {citation.pageNumber || 1}
                   </p>

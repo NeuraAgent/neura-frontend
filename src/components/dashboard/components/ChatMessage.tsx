@@ -7,8 +7,8 @@ import { Check, Copy, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { CodeBlock } from 'react-code-blocks';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
+import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 
 import { Message } from '../types';
@@ -63,17 +63,18 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   {message.images && message.images.length > 0 && (
                     <div className="flex flex-row flex-wrap gap-2 mt-2">
                       {message.images.map((img, idx) => (
-                        <div 
-                          key={idx} 
+                        <div
+                          key={idx}
                           className="relative rounded-lg overflow-hidden border border-[#404040] w-20 h-20 sm:w-24 sm:h-24 cursor-pointer hover:opacity-90 transition-opacity flex-shrink-0"
                           onClick={() => setSelectedImage(img.url)}
                         >
-                          <img 
-                            src={img.url} 
-                            alt={`Uploaded attachment ${idx + 1}`} 
+                          <img
+                            src={img.url}
+                            alt={`Uploaded attachment ${idx + 1}`}
                             className="w-full h-full object-cover"
                           />
-                          {(img.status === 'uploading' || img.status === 'processing') && (
+                          {(img.status === 'uploading' ||
+                            img.status === 'processing') && (
                             <div className="absolute inset-0 bg-black/50 flex items-center justify-center backdrop-blur-[2px]">
                               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                             </div>
@@ -145,20 +146,23 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
         </div>
       </div>
       {selectedImage && (
-        <div 
+        <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
           onClick={() => setSelectedImage(null)}
         >
-          <div className="relative max-w-5xl w-full h-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
-            <button 
+          <div
+            className="relative max-w-5xl w-full h-full flex items-center justify-center"
+            onClick={e => e.stopPropagation()}
+          >
+            <button
               className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/80 transition-colors z-10"
               onClick={() => setSelectedImage(null)}
             >
-               <X className="w-6 h-6" />
+              <X className="w-6 h-6" />
             </button>
-            <img 
-              src={selectedImage} 
-              alt="Full size view" 
+            <img
+              src={selectedImage}
+              alt="Full size view"
               className="max-w-full max-h-full object-contain rounded-md"
             />
           </div>

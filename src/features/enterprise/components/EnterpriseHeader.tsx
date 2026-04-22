@@ -2,7 +2,7 @@ import { Bell, ChevronDown, Search, Shield } from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
 
 import { useABAC } from '@/features/abac';
-import { DEPARTMENT_LABELS, CLEARANCE_LEVELS, type EnterpriseUser } from '@/features/abac/types';
+import { DEPARTMENT_LABELS, type EnterpriseUser } from '@/features/abac/types';
 
 interface EnterpriseHeaderProps {
   onSearch?: (query: string) => void;

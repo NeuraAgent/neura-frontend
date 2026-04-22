@@ -2,8 +2,8 @@ import { Mail, Lock, Loader2, AlertCircle } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { useEnterpriseAuth } from '@/features/auth/EnterpriseAuthContext';
 import enterpriseAuthService from '@/features/auth/authService';
+import { useEnterpriseAuth } from '@/features/auth/EnterpriseAuthContext';
 
 export function EnterpriseLoginPage() {
   const navigate = useNavigate();
@@ -55,7 +55,9 @@ export function EnterpriseLoginPage() {
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-600 mb-4">
             <div className="text-white font-bold text-lg">N</div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Neura Enterprise</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Neura Enterprise
+          </h1>
           <p className="text-gray-500">AI-Powered Knowledge System</p>
         </div>
 
@@ -72,7 +74,10 @@ export function EnterpriseLoginPage() {
 
             {/* Email Input */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-900 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-900 mb-2"
+              >
                 Email Address
               </label>
               <div className="relative">
@@ -91,7 +96,10 @@ export function EnterpriseLoginPage() {
 
             {/* Password Input */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-900 mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-900 mb-2"
+              >
                 Password
               </label>
               <div className="relative">
@@ -106,7 +114,9 @@ export function EnterpriseLoginPage() {
                   disabled={isLoading}
                 />
               </div>
-              <p className="text-xs text-gray-500 mt-1">Any password works in demo mode</p>
+              <p className="text-xs text-gray-500 mt-1">
+                Any password works in demo mode
+              </p>
             </div>
 
             {/* Submit Button */}
@@ -131,7 +141,9 @@ export function EnterpriseLoginPage() {
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="px-2 bg-white text-gray-500">Or try with demo users</span>
+                <span className="px-2 bg-white text-gray-500">
+                  Or try with demo users
+                </span>
               </div>
             </div>
 
@@ -160,7 +172,9 @@ export function EnterpriseLoginPage() {
                       <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600">
                         {user.firstName} {user.lastName}
                       </p>
-                      <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {user.email}
+                      </p>
                       <div className="flex gap-2 mt-1">
                         <span className="inline-block px-2 py-0.5 text-[10px] font-medium bg-blue-100 text-blue-700 rounded">
                           {user.attributes.role}
@@ -170,7 +184,9 @@ export function EnterpriseLoginPage() {
                         </span>
                       </div>
                     </div>
-                    <div className="text-xs text-gray-400 ml-2 flex-shrink-0">→</div>
+                    <div className="text-xs text-gray-400 ml-2 flex-shrink-0">
+                      →
+                    </div>
                   </div>
                 </button>
               ))}

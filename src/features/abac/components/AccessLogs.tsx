@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
+
 import { useABAC } from '../ABACContext';
-import type { AccessLog } from '../types';
 
 export function AccessLogs() {
-  const { accessLogs, currentUser } = useABAC();
+  const { accessLogs } = useABAC();
   const [filter, setFilter] = useState<'all' | 'allowed' | 'denied'>('all');
 
   const filteredLogs = useMemo(() => {
@@ -41,8 +41,10 @@ export function AccessLogs() {
             }`}
           >
             {f === 'all' && 'All'}
-            {f === 'allowed' && `Allowed (${accessLogs.filter(l => l.decision.allowed).length})`}
-            {f === 'denied' && `Denied (${accessLogs.filter(l => !l.decision.allowed).length})`}
+            {f === 'allowed' &&
+              `Allowed (${accessLogs.filter(l => l.decision.allowed).length})`}
+            {f === 'denied' &&
+              `Denied (${accessLogs.filter(l => !l.decision.allowed).length})`}
           </button>
         ))}
       </div>
@@ -52,16 +54,29 @@ export function AccessLogs() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="px-4 py-3 text-left font-semibold text-gray-700">Time</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-700">Action</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-700">Document ID</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-700">Decision</th>
-              <th className="px-4 py-3 text-left font-semibold text-gray-700">Reason</th>
+              <th className="px-4 py-3 text-left font-semibold text-gray-700">
+                Time
+              </th>
+              <th className="px-4 py-3 text-left font-semibold text-gray-700">
+                Action
+              </th>
+              <th className="px-4 py-3 text-left font-semibold text-gray-700">
+                Document ID
+              </th>
+              <th className="px-4 py-3 text-left font-semibold text-gray-700">
+                Decision
+              </th>
+              <th className="px-4 py-3 text-left font-semibold text-gray-700">
+                Reason
+              </th>
             </tr>
           </thead>
           <tbody>
             {filteredLogs.map(log => (
-              <tr key={log.id} className="border-b border-gray-100 hover:bg-gray-50">
+              <tr
+                key={log.id}
+                className="border-b border-gray-100 hover:bg-gray-50"
+              >
                 <td className="px-4 py-3 text-gray-600">
                   {new Date(log.timestamp).toLocaleTimeString()}
                 </td>
@@ -86,7 +101,9 @@ export function AccessLogs() {
                 </td>
                 <td className="px-4 py-3 text-gray-600">
                   <details className="group">
-                    <summary className="cursor-pointer hover:underline">Show reason</summary>
+                    <summary className="cursor-pointer hover:underline">
+                      Show reason
+                    </summary>
                     <p className="mt-2 rounded bg-gray-100 p-2 text-xs">
                       {log.decision.reason}
                     </p>
@@ -102,7 +119,9 @@ export function AccessLogs() {
       <div className="grid grid-cols-3 gap-4 rounded-xl border border-gray-200 p-4">
         <div>
           <p className="text-xs text-gray-600">Total Logs</p>
-          <p className="text-lg font-semibold text-gray-900">{filteredLogs.length}</p>
+          <p className="text-lg font-semibold text-gray-900">
+            {filteredLogs.length}
+          </p>
         </div>
         <div>
           <p className="text-xs text-gray-600">Allowed</p>

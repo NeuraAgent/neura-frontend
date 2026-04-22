@@ -9,8 +9,8 @@ import type {
   User,
 } from '@/types';
 import { createApiClient, DEV_TOKEN_STORAGE } from '@/utils/apiClient';
-import { handleNetworkError, logError } from '@/utils/errorHandler';
 import { env } from '@/utils/env';
+import { handleNetworkError, logError } from '@/utils/errorHandler';
 
 const api = createApiClient(BASE_URLS.API_GATEWAY);
 

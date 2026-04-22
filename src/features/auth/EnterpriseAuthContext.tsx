@@ -1,7 +1,14 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
+
+import type { EnterpriseUser } from '@/features/abac/types';
 
 import enterpriseAuthService from './authService';
-import type { EnterpriseUser } from '@/features/abac/types';
 
 export interface EnterpriseAuthContextValue {
   // State
@@ -17,12 +24,18 @@ export interface EnterpriseAuthContextValue {
   checkAuth: () => Promise<void>;
 }
 
-const EnterpriseAuthContext = createContext<EnterpriseAuthContextValue | undefined>(undefined);
+const EnterpriseAuthContext = createContext<
+  EnterpriseAuthContextValue | undefined
+>(undefined);
 
 const STORAGE_KEY_TOKEN = 'enterprise_auth_token';
 const STORAGE_KEY_EXPIRY = 'enterprise_auth_expiry';
 
-export function EnterpriseAuthProvider({ children }: { children: React.ReactNode }) {
+export function EnterpriseAuthProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [user, setUser] = useState<EnterpriseUser | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -49,7 +62,8 @@ export function EnterpriseAuthProvider({ children }: { children: React.ReactNode
       }
 
       // Validate token and get user
-      const currentUser = await enterpriseAuthService.getCurrentUser(savedToken);
+      const currentUser =
+        await enterpriseAuthService.getCurrentUser(savedToken);
 
       if (currentUser) {
         setAccessToken(savedToken);
@@ -128,7 +142,8 @@ export function EnterpriseAuthProvider({ children }: { children: React.ReactNode
     }
 
     try {
-      const currentUser = await enterpriseAuthService.getCurrentUser(accessToken);
+      const currentUser =
+        await enterpriseAuthService.getCurrentUser(accessToken);
       if (!currentUser) {
         setUser(null);
         setAccessToken(null);
@@ -162,7 +177,9 @@ export function EnterpriseAuthProvider({ children }: { children: React.ReactNode
 export function useEnterpriseAuth(): EnterpriseAuthContextValue {
   const context = useContext(EnterpriseAuthContext);
   if (!context) {
-    throw new Error('useEnterpriseAuth must be used within EnterpriseAuthProvider');
+    throw new Error(
+      'useEnterpriseAuth must be used within EnterpriseAuthProvider'
+    );
   }
   return context;
 }

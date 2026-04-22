@@ -1,8 +1,7 @@
-import { FileText, Filter, Grid, List, Search, X } from 'lucide-react';
+import { FileText, Grid, List, Search, X } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 
 import { useABAC } from '@/features/abac';
-import { useDocumentSelection } from '../DocumentSelectionContext';
 import {
   DEPARTMENT_LABELS,
   SENSITIVITY_CONFIG,
@@ -11,6 +10,8 @@ import {
   type EnterpriseDocument,
 } from '@/features/abac/types';
 
+import { useDocumentSelection } from '../DocumentSelectionContext';
+
 import { DocumentCard } from './DocumentCard';
 
 interface DocumentsListProps {
@@ -18,13 +19,22 @@ interface DocumentsListProps {
   showCheckboxes?: boolean;
 }
 
-export function DocumentsList({ onDocumentView, showCheckboxes = false }: DocumentsListProps) {
+export function DocumentsList({
+  onDocumentView,
+  showCheckboxes = false,
+}: DocumentsListProps) {
   const { allDocuments, checkAccess } = useABAC();
-  const { selectionCount } = useDocumentSelection();
+  const { selectionCount: _selectionCount } = useDocumentSelection();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedDepartment, setSelectedDepartment] = useState<Department | 'all'>('all');
-  const [selectedSensitivity, setSelectedSensitivity] = useState<Sensitivity | 'all'>('all');
-  const [showAccessible, setShowAccessible] = useState<'all' | 'accessible' | 'restricted'>('all');
+  const [selectedDepartment, setSelectedDepartment] = useState<
+    Department | 'all'
+  >('all');
+  const [selectedSensitivity, setSelectedSensitivity] = useState<
+    Sensitivity | 'all'
+  >('all');
+  const [showAccessible, setShowAccessible] = useState<
+    'all' | 'accessible' | 'restricted'
+  >('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // Filter documents
@@ -41,12 +51,18 @@ export function DocumentsList({ onDocumentView, showCheckboxes = false }: Docume
       }
 
       // Department filter
-      if (selectedDepartment !== 'all' && doc.attributes.department !== selectedDepartment) {
+      if (
+        selectedDepartment !== 'all' &&
+        doc.attributes.department !== selectedDepartment
+      ) {
         return false;
       }
 
       // Sensitivity filter
-      if (selectedSensitivity !== 'all' && doc.attributes.sensitivity !== selectedSensitivity) {
+      if (
+        selectedSensitivity !== 'all' &&
+        doc.attributes.sensitivity !== selectedSensitivity
+      ) {
         return false;
       }
 
@@ -59,14 +75,24 @@ export function DocumentsList({ onDocumentView, showCheckboxes = false }: Docume
 
       return true;
     });
-  }, [allDocuments, searchQuery, selectedDepartment, selectedSensitivity, showAccessible, checkAccess]);
+  }, [
+    allDocuments,
+    searchQuery,
+    selectedDepartment,
+    selectedSensitivity,
+    showAccessible,
+    checkAccess,
+  ]);
 
   // Get unique departments and sensitivities
   const departments = Object.keys(DEPARTMENT_LABELS) as Department[];
   const sensitivities = Object.keys(SENSITIVITY_CONFIG) as Sensitivity[];
 
   const hasActiveFilters =
-    searchQuery || selectedDepartment !== 'all' || selectedSensitivity !== 'all' || showAccessible !== 'all';
+    searchQuery ||
+    selectedDepartment !== 'all' ||
+    selectedSensitivity !== 'all' ||
+    showAccessible !== 'all';
 
   const clearFilters = () => {
     setSearchQuery('');
@@ -97,7 +123,9 @@ export function DocumentsList({ onDocumentView, showCheckboxes = false }: Docume
             {/* Department Filter */}
             <select
               value={selectedDepartment}
-              onChange={e => setSelectedDepartment(e.target.value as Department | 'all')}
+              onChange={e =>
+                setSelectedDepartment(e.target.value as Department | 'all')
+              }
               className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gray-200"
             >
               <option value="all">All Departments</option>
@@ -111,7 +139,9 @@ export function DocumentsList({ onDocumentView, showCheckboxes = false }: Docume
             {/* Sensitivity Filter */}
             <select
               value={selectedSensitivity}
-              onChange={e => setSelectedSensitivity(e.target.value as Sensitivity | 'all')}
+              onChange={e =>
+                setSelectedSensitivity(e.target.value as Sensitivity | 'all')
+              }
               className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gray-200"
             >
               <option value="all">All Sensitivity</option>
@@ -125,7 +155,11 @@ export function DocumentsList({ onDocumentView, showCheckboxes = false }: Docume
             {/* Access Filter */}
             <select
               value={showAccessible}
-              onChange={e => setShowAccessible(e.target.value as 'all' | 'accessible' | 'restricted')}
+              onChange={e =>
+                setShowAccessible(
+                  e.target.value as 'all' | 'accessible' | 'restricted'
+                )
+              }
               className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gray-200"
             >
               <option value="all">All Documents</option>
@@ -149,7 +183,9 @@ export function DocumentsList({ onDocumentView, showCheckboxes = false }: Docume
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-1.5 rounded-md transition-colors ${
-                  viewMode === 'grid' ? 'bg-white shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                  viewMode === 'grid'
+                    ? 'bg-white shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
                 <Grid className="w-4 h-4" />
@@ -157,7 +193,9 @@ export function DocumentsList({ onDocumentView, showCheckboxes = false }: Docume
               <button
                 onClick={() => setViewMode('list')}
                 className={`p-1.5 rounded-md transition-colors ${
-                  viewMode === 'list' ? 'bg-white shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                  viewMode === 'list'
+                    ? 'bg-white shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
                 <List className="w-4 h-4" />
@@ -170,8 +208,15 @@ export function DocumentsList({ onDocumentView, showCheckboxes = false }: Docume
       {/* Results Count */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-500">
-          Showing <span className="font-medium text-gray-900">{filteredDocuments.length}</span> of{' '}
-          <span className="font-medium text-gray-900">{allDocuments.length}</span> documents
+          Showing{' '}
+          <span className="font-medium text-gray-900">
+            {filteredDocuments.length}
+          </span>{' '}
+          of{' '}
+          <span className="font-medium text-gray-900">
+            {allDocuments.length}
+          </span>{' '}
+          documents
         </p>
       </div>
 
@@ -198,7 +243,9 @@ export function DocumentsList({ onDocumentView, showCheckboxes = false }: Docume
           <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
             <FileText className="w-6 h-6 text-gray-400" />
           </div>
-          <h3 className="text-sm font-medium text-gray-900 mb-1">No documents found</h3>
+          <h3 className="text-sm font-medium text-gray-900 mb-1">
+            No documents found
+          </h3>
           <p className="text-sm text-gray-500">
             Try adjusting your filters or search query
           </p>

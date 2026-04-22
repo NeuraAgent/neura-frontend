@@ -1,4 +1,5 @@
 import React from 'react';
+
 import type { AccessDecision } from '../types';
 
 interface AccessTransparencyProps {
@@ -9,7 +10,7 @@ interface AccessTransparencyProps {
 
 export function AccessTransparency({
   decision,
-  documentTitle = 'Document',
+  documentTitle: _documentTitle = 'Document',
   showFullDetails = false,
 }: AccessTransparencyProps) {
   const { allowed, reason, reasons = [reason] } = decision;
@@ -23,14 +24,18 @@ export function AccessTransparency({
             <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-50">
               <span className="text-sm font-semibold text-emerald-700">✓</span>
             </div>
-            <span className="text-sm font-semibold text-emerald-700">Access Allowed</span>
+            <span className="text-sm font-semibold text-emerald-700">
+              Access Allowed
+            </span>
           </>
         ) : (
           <>
             <div className="flex h-5 w-5 items-center justify-center rounded-full bg-red-50">
               <span className="text-sm font-semibold text-red-700">✕</span>
             </div>
-            <span className="text-sm font-semibold text-red-700">Access Denied</span>
+            <span className="text-sm font-semibold text-red-700">
+              Access Denied
+            </span>
           </>
         )}
       </div>

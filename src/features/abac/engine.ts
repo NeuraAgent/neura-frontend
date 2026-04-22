@@ -3,13 +3,12 @@ import type {
   EnterpriseUser,
   AccessDecision,
   ABACRule,
-  hasSufficientClearance,
 } from './types';
 import { CLEARANCE_LEVELS, SENSITIVITY_LEVELS } from './types';
 
 /**
  * ABAC (Attribute-Based Access Control) Engine
- * 
+ *
  * Evaluates access decisions based on:
  * 1. User attributes (department, role, clearance, region)
  * 2. Document attributes (department, sensitivity, region)
@@ -85,23 +84,33 @@ export const defaultABACRules: ABACRule[] = [
 /**
  * Check if user clearance level meets document sensitivity
  */
-function checkClearance(user: EnterpriseUser, document: EnterpriseDocument): boolean {
+function checkClearance(
+  user: EnterpriseUser,
+  document: EnterpriseDocument
+): boolean {
   const userClearanceLevel = CLEARANCE_LEVELS[user.attributes.clearance];
-  const docSensitivityLevel = SENSITIVITY_LEVELS[document.attributes.sensitivity];
+  const docSensitivityLevel =
+    SENSITIVITY_LEVELS[document.attributes.sensitivity];
   return userClearanceLevel >= docSensitivityLevel;
 }
 
 /**
  * Check if user department matches document department
  */
-function checkDepartmentMatch(user: EnterpriseUser, document: EnterpriseDocument): boolean {
+function checkDepartmentMatch(
+  user: EnterpriseUser,
+  document: EnterpriseDocument
+): boolean {
   return user.attributes.department === document.attributes.department;
 }
 
 /**
  * Check if user manages the document's department
  */
-function checkManagedDepartment(user: EnterpriseUser, document: EnterpriseDocument): boolean {
+function checkManagedDepartment(
+  user: EnterpriseUser,
+  document: EnterpriseDocument
+): boolean {
   const managedDepts = user.attributes.managedDepartments || [];
   return managedDepts.includes(document.attributes.department);
 }
@@ -109,13 +118,16 @@ function checkManagedDepartment(user: EnterpriseUser, document: EnterpriseDocume
 /**
  * Check if user region matches or document is global
  */
-function checkRegionAccess(user: EnterpriseUser, document: EnterpriseDocument): boolean {
+function checkRegionAccess(
+  user: EnterpriseUser,
+  document: EnterpriseDocument
+): boolean {
   const docRegion = document.attributes.region;
   const userRegion = user.attributes.region;
-  
+
   // Global documents are accessible to all regions
   if (docRegion === 'GLOBAL') return true;
-  
+
   // User must be in the same region
   return userRegion === docRegion;
 }
@@ -123,19 +135,22 @@ function checkRegionAccess(user: EnterpriseUser, document: EnterpriseDocument): 
 /**
  * Check if user has access to the project
  */
-function checkProjectAccess(user: EnterpriseUser, document: EnterpriseDocument): boolean {
+function checkProjectAccess(
+  user: EnterpriseUser,
+  document: EnterpriseDocument
+): boolean {
   const docProject = document.attributes.project;
-  
+
   // If no project restriction, allow
   if (!docProject) return true;
-  
+
   const allowedProjects = user.attributes.allowedProjects || [];
-  
+
   // Directors and admins have access to all projects
   if (user.attributes.role === 'director' || user.attributes.role === 'admin') {
     return true;
   }
-  
+
   return allowedProjects.includes(docProject);
 }
 
@@ -146,14 +161,16 @@ function checkProjectAccess(user: EnterpriseUser, document: EnterpriseDocument):
 export function evaluateAccess(
   user: EnterpriseUser,
   document: EnterpriseDocument,
-  action: 'view' | 'download' | 'edit' | 'delete' | 'share' = 'view'
+  _action: 'view' | 'download' | 'edit' | 'delete' | 'share' = 'view'
 ): AccessDecision {
   const timestamp = new Date().toISOString();
   const reasons: string[] = [];
 
   // Rule 1: Check clearance level (fundamental requirement)
   if (!checkClearance(user, document)) {
-    reasons.push(`Insufficient clearance level. User has '${user.attributes.clearance}' clearance, but document requires '${document.attributes.sensitivity}' or higher.`);
+    reasons.push(
+      `Insufficient clearance level. User has '${user.attributes.clearance}' clearance, but document requires '${document.attributes.sensitivity}' or higher.`
+    );
     return {
       allowed: false,
       reason: reasons.join(' '),
@@ -261,8 +278,10 @@ export function getAccessSummary(
   const bySensitivity: Record<string, number> = {};
 
   accessible.forEach(doc => {
-    byDepartment[doc.attributes.department] = (byDepartment[doc.attributes.department] || 0) + 1;
-    bySensitivity[doc.attributes.sensitivity] = (bySensitivity[doc.attributes.sensitivity] || 0) + 1;
+    byDepartment[doc.attributes.department] =
+      (byDepartment[doc.attributes.department] || 0) + 1;
+    bySensitivity[doc.attributes.sensitivity] =
+      (bySensitivity[doc.attributes.sensitivity] || 0) + 1;
   });
 
   return {

@@ -17,10 +17,19 @@ import LandingPage from '@/components/landing/LandingPage';
 import Layout from '@/components/Layout';
 import { useAuth } from '@/contexts/AuthContext';
 import { ABACProvider } from '@/features/abac';
-import { EnterpriseAuthProvider, EnterpriseProtectedRoute } from '@/features/auth';
-import { EnterpriseLayout } from '@/features/enterprise';
+import {
+  EnterpriseAuthProvider,
+  EnterpriseProtectedRoute,
+} from '@/features/auth';
 import { DocumentSelectionProvider } from '@/features/documents/DocumentSelectionContext';
-import { EnterpriseDashboard, DocumentsPage, AccessControlPage, ChatPage, EnterpriseLoginPage } from '@/pages/enterprise';
+import { EnterpriseLayout } from '@/features/enterprise';
+import {
+  EnterpriseDashboard,
+  DocumentsPage,
+  AccessControlPage,
+  ChatPage,
+  EnterpriseLoginPage,
+} from '@/pages/enterprise';
 import Settings from '@/pages/Settings';
 
 const AppRoutes: React.FC = () => {
@@ -217,8 +226,13 @@ const AppRoutes: React.FC = () => {
                 <ABACProvider>
                   <EnterpriseLayout>
                     <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-                      <h2 className="text-lg font-semibold text-gray-900 mb-2">Folders</h2>
-                      <p className="text-sm text-gray-500">Organize documents into folders with inherited permissions</p>
+                      <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                        Folders
+                      </h2>
+                      <p className="text-sm text-gray-500">
+                        Organize documents into folders with inherited
+                        permissions
+                      </p>
                     </div>
                   </EnterpriseLayout>
                 </ABACProvider>
@@ -234,8 +248,12 @@ const AppRoutes: React.FC = () => {
                 <ABACProvider>
                   <EnterpriseLayout>
                     <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-                      <h2 className="text-lg font-semibold text-gray-900 mb-2">User Management</h2>
-                      <p className="text-sm text-gray-500">Manage users and their ABAC attributes</p>
+                      <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                        User Management
+                      </h2>
+                      <p className="text-sm text-gray-500">
+                        Manage users and their ABAC attributes
+                      </p>
                     </div>
                   </EnterpriseLayout>
                 </ABACProvider>
@@ -251,8 +269,12 @@ const AppRoutes: React.FC = () => {
                 <ABACProvider>
                   <EnterpriseLayout>
                     <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-                      <h2 className="text-lg font-semibold text-gray-900 mb-2">Analytics</h2>
-                      <p className="text-sm text-gray-500">Document access analytics and insights</p>
+                      <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                        Analytics
+                      </h2>
+                      <p className="text-sm text-gray-500">
+                        Document access analytics and insights
+                      </p>
                     </div>
                   </EnterpriseLayout>
                 </ABACProvider>
@@ -268,8 +290,12 @@ const AppRoutes: React.FC = () => {
                 <ABACProvider>
                   <EnterpriseLayout>
                     <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-                      <h2 className="text-lg font-semibold text-gray-900 mb-2">Settings</h2>
-                      <p className="text-sm text-gray-500">Configure ABAC policies and enterprise settings</p>
+                      <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                        Settings
+                      </h2>
+                      <p className="text-sm text-gray-500">
+                        Configure ABAC policies and enterprise settings
+                      </p>
                     </div>
                   </EnterpriseLayout>
                 </ABACProvider>
