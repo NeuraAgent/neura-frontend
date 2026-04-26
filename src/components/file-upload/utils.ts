@@ -26,7 +26,13 @@ export const createFilesWithProgress = (files: File[]): FileWithProgress[] => {
 };
 
 export const extractFileId = (s3Key: string): string => {
-  return s3Key.split('/').pop()?.split('_sha')[1]?.split('sha')[0] || s3Key;
+  if (!s3Key) return `fallback-${Date.now()}`;
+  // Key pattern: uploads/YYYY/MM/{originalName}_sha{fileId}sha.{ext}
+  const segment = s3Key.split('/').pop() || s3Key;
+  const shaMatch = segment.match(/_sha([^_]+)sha\./);
+  if (shaMatch && shaMatch[1]) return shaMatch[1];
+  // Fallback: use the whole segment minus extension as a stable identifier
+  return segment.replace(/\.[^/.]+$/, '') || `fallback-${Date.now()}`;
 };
 
 export const getFileType = (file: File): string => {

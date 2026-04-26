@@ -13,7 +13,12 @@ import { AccessTransparency, AccessLogs } from '@/features/abac/components';
 import { DEPARTMENT_LABELS, SENSITIVITY_CONFIG } from '@/features/abac/types';
 
 export function AccessControlPage() {
-  const { currentUser, allDocuments, checkAccess, logAccess: _logAccess } = useABAC();
+  const {
+    currentUser,
+    allDocuments,
+    checkAccess,
+    logAccess: _logAccess,
+  } = useABAC();
   const [expandedDocId, setExpandedDocId] = useState<string | null>(null);
 
   // Get access decisions for all documents

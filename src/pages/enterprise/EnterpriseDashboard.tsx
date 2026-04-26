@@ -1,10 +1,4 @@
-import {
-  FileText,
-  Shield,
-  TrendingUp,
-  ChevronRight,
-  Lock,
-} from 'lucide-react';
+import { FileText, Shield, TrendingUp, ChevronRight, Lock } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 

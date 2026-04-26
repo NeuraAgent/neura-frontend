@@ -12,16 +12,16 @@ services:
         VITE_APP_VERSION: ${VITE_APP_VERSION:-1.0.0}
         VITE_SESSION_TTL: ${VITE_SESSION_TTL:-2592000000}
         NODE_ENV: ${NODE_ENV:-production}
-        VITE_AWS_ACCESS_KEY_ID: ${VITE_AWS_ACCESS_KEY_ID}
-        VITE_AWS_SECRET_ACCESS_KEY: ${VITE_AWS_SECRET_ACCESS_KEY}
-        VITE_AWS_REGION: ${VITE_AWS_REGION:-ap-southeast-2}
-        VITE_AWS_S3_BUCKET_NAME: ${VITE_AWS_S3_BUCKET_NAME:-nouraagents}
-        VITE_AWS_S3_ENDPOINT: ${VITE_AWS_S3_ENDPOINT:-https://s3.amazonaws.com}
+        VITE_MINIO_ACCESS_KEY: ${VITE_MINIO_ACCESS_KEY}
+        VITE_MINIO_SECRET_KEY: ${VITE_MINIO_SECRET_KEY}
+
+        VITE_MINIO_BUCKET_NAME: ${VITE_MINIO_BUCKET_NAME:-neura-bucket}
+        VITE_MINIO_ENDPOINT: ${VITE_MINIO_ENDPOINT:-http://100.68.50.41:9000}
         VITE_FRONTEND_JWT_TOKEN: ${VITE_FRONTEND_JWT_TOKEN}
     env_file:
       - .env.prod
     platform: linux/amd64
-    image: vanhoadotbui2628/neura_frontend:1.4.7
+    image: vanhoadotbui2628/neura_frontend:1.6.0
     container_name: neura-frontend
     ports:
       - '3000:80'

@@ -2,6 +2,7 @@ import { Plus, FileText, Trash2, RefreshCw } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 import { useLocale } from '@/contexts/LocaleContext';
+import { deleteFile } from '@/services/s3StorageService';
 import userFileService from '@/services/userFileService';
 import { useIntroTourStore } from '@/stores/introTourStore';
 import { useUserStore } from '@/stores/userStore';
@@ -202,6 +203,11 @@ const SourcesManager: React.FC<SourcesManagerProps> = ({
     if (!source) return;
 
     try {
+      // First explicitly delete the core asset from MinIO via initialized SDK
+      if (source.s3Key) {
+        await deleteFile(source.s3Key);
+      }
+
       await userFileService.removeFile(source.id);
       setFileIds(getFileIds().filter(fileId => fileId !== sourceId));
 

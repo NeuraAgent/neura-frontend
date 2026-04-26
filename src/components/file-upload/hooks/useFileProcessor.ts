@@ -1,7 +1,7 @@
 import { chunkService } from '@/services/chunkService';
 import ocrService from '@/services/ocrService';
 import {
-  s3StorageService,
+  uploadFile,
   FileUploadResult,
 } from '@/services/s3StorageService';
 import userFileService from '@/services/userFileService';
@@ -124,7 +124,7 @@ export const useFileProcessor = ({
 
     onProgress(file.name, uploadStart);
 
-    return await s3StorageService.uploadFile(file, progress => {
+    return await uploadFile(file, progress => {
       const currentProgress =
         uploadStart + Math.floor((progress.progress / 100) * uploadRange);
       onProgress(file.name, currentProgress);

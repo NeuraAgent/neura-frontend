@@ -19,26 +19,23 @@ const envSchema = z.object({
     .string()
     .min(1, 'VITE_APP_NAME cannot be empty')
     .describe('Application name'),
-  VITE_AWS_ACCESS_KEY_ID: z
+  VITE_MINIO_ACCESS_KEY: z
     .string()
-    .min(1, 'VITE_AWS_ACCESS_KEY_ID cannot be empty')
-    .describe('AWS access key ID'),
-  VITE_AWS_SECRET_ACCESS_KEY: z
+    .min(1, 'VITE_MINIO_ACCESS_KEY cannot be empty')
+    .describe('MinIO access key'),
+  VITE_MINIO_SECRET_KEY: z
     .string()
-    .min(1, 'VITE_AWS_SECRET_ACCESS_KEY cannot be empty')
-    .describe('AWS secret access key'),
-  VITE_AWS_REGION: z
+    .min(1, 'VITE_MINIO_SECRET_KEY cannot be empty')
+    .describe('MinIO secret key'),
+
+  VITE_MINIO_BUCKET_NAME: z
     .string()
-    .min(1, 'VITE_AWS_REGION cannot be empty')
-    .describe('AWS region'),
-  VITE_AWS_S3_BUCKET_NAME: z
+    .min(1, 'VITE_MINIO_BUCKET_NAME cannot be empty')
+    .describe('MinIO bucket name'),
+  VITE_MINIO_ENDPOINT: z
     .string()
-    .min(1, 'VITE_AWS_S3_BUCKET_NAME cannot be empty')
-    .describe('AWS S3 bucket name'),
-  VITE_AWS_S3_ENDPOINT: z
-    .string()
-    .min(1, 'VITE_AWS_S3_ENDPOINT cannot be empty')
-    .describe('AWS S3 endpoint'),
+    .min(1, 'VITE_MINIO_ENDPOINT cannot be empty')
+    .describe('MinIO endpoint'),
   VITE_SESSION_TTL: z
     .string()
     .min(1, 'VITE_SESSION_TTL cannot be empty')
@@ -104,11 +101,11 @@ export function validateEnv(): Env {
       console.error('  - VITE_API_URL: API base URL');
       console.error('  - VITE_WEBSOCKET_URL: WebSocket server URL');
       console.error('  - VITE_APP_NAME: Application name');
-      console.error('  - VITE_AWS_ACCESS_KEY_ID: AWS access key ID');
-      console.error('  - VITE_AWS_SECRET_ACCESS_KEY: AWS secret access key');
-      console.error('  - VITE_AWS_REGION: AWS region');
-      console.error('  - VITE_AWS_S3_BUCKET_NAME: AWS S3 bucket name');
-      console.error('  - VITE_AWS_S3_ENDPOINT: AWS S3 endpoint');
+      console.error('  - VITE_MINIO_ACCESS_KEY: MinIO access key');
+      console.error('  - VITE_MINIO_SECRET_KEY: MinIO secret key');
+
+      console.error('  - VITE_MINIO_BUCKET_NAME: MinIO bucket name');
+      console.error('  - VITE_MINIO_ENDPOINT: MinIO endpoint');
       console.error('  - VITE_SESSION_TTL: Vite session ttl');
 
       console.error(
